@@ -15,6 +15,7 @@ import 'bloc/collection_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
 import 'package:wms_app/modules/outbound/collection_task/outbound_collection_result_page.dart';
 import 'package:wms_app/modules/outbound/collection_task/models/deleted_payload.dart';
+import 'package:wms_app/modules/outbound/exception_collection/models/exception_collection_args.dart';
 
 class OutboundCollectionPage extends StatefulWidget {
   final OutboundTask task;
@@ -608,7 +609,14 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     switch (action) {
       case 'exception':
         // 导航到异常采集页面
-        Modular.to.pushNamed('/exception');
+        Modular.to.pushNamed(
+          '/outbound/exception',
+          arguments: ExceptionCollectionArgs(
+            task: widget.task,
+            trayNo: '',
+            storeSite: _bloc.state.storeSite,
+          ),
+        );
         break;
       case 'shortage':
         _handleShortageAction(context);
