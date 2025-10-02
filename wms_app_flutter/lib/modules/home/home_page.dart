@@ -235,6 +235,7 @@ class _FunctionGrid extends StatelessWidget {
     FunctionItem('立库组盘', 'assets/images/home_icon_ palletizing.svg'),
     FunctionItem('平库入库', 'assets/images/home_icon_ inbound.svg'),
     FunctionItem('平库出库', 'assets/images/home_icon_ outbound.svg'),
+    FunctionItem('平库下架接收', 'assets/images/home_icon_ outbound.svg'),
     FunctionItem('在线拣选', 'assets/images/home_icon_online_picking.svg'),
     FunctionItem('拉式发料', 'assets/images/home_icon_pull_feeding.svg'),
     FunctionItem('平库盘点', 'assets/images/home_icon_floor_count.svg'),
@@ -289,6 +290,26 @@ class _FunctionGrid extends StatelessWidget {
         onTap: () {
           if (f.title == '平库出库') {
             Modular.to.pushNamed('/outbound');
+          } else if (f.title == '平库下架接收') {
+            Modular.to.pushNamed('/outbound/receive');
+          } else if (f.title == '到货接收') {
+            Modular.to.pushNamed('/arrival');
+          } else if (f.title == '立库组盘') {
+            Modular.to.pushNamed('/palletizing');
+          } else if (f.title == '平库入库') {
+            Modular.to.pushNamed('/floor-inbound');
+          } else if (f.title == '在线拣选') {
+            Modular.to.pushNamed('/online-picking');
+          } else if (f.title == '拉式发料') {
+            Modular.to.pushNamed('/pull-feeding');
+          } else if (f.title == '平库盘点') {
+            Modular.to.pushNamed('/floor-count');
+          } else if (f.title == '平库移库') {
+            Modular.to.pushNamed('/floor-transfer');
+          } else if (f.title == '立库盘点') {
+            Modular.to.pushNamed('/warehouse-count');
+          } else if (f.title == '库存查询') {
+            Modular.to.pushNamed('/inventory-query');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
