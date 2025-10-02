@@ -1,0 +1,2 @@
+/Users/ming/Documents/金风项目/wms_app/build/.cxx/debug/1w1m6v3o/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/ming/Documents/金风项目/wms_app/build/.cxx/debug/1w1m6v3o/arm64-v8a/CMakeFiles/rebuild_cache.dir

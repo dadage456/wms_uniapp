@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/ming/develop/flutter/packages/flutter_tools/gradle/src/main/scripts/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/ming/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/ming/Documents/金风项目/wms_app/build/.cxx/debug/1w1m6v3o/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/ming/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/ming/Documents/金风项目/wms_app/build/.cxx/debug/1w1m6v3o/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
