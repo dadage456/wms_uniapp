@@ -50,6 +50,12 @@ class ArrivalTaskDetailGridConfig {
         valueGetter: (item) => item.serialNo,
       ),
       GridColumnConfig<ArrivalTaskDetail>(
+        name: 'controlMode',
+        headerText: '控制属性',
+        width: 120,
+        valueGetter: (item) => item.controlMode,
+      ),
+      GridColumnConfig<ArrivalTaskDetail>(
         name: 'storeroom',
         headerText: '库房',
         width: 120,
@@ -66,6 +72,18 @@ class ArrivalTaskDetailGridConfig {
         headerText: 'SAP行号',
         width: 120,
         valueGetter: (item) => item.sapLineNo,
+      ),
+      GridColumnConfig<ArrivalTaskDetail>(
+        name: 'orderno',
+        headerText: '装箱单号',
+        width: 150,
+        valueGetter: (item) => item.orderNo,
+      ),
+      GridColumnConfig<ArrivalTaskDetail>(
+        name: 'arrivalsBillno',
+        headerText: '到货单号',
+        width: 150,
+        valueGetter: (item) => item.arrivalsBillNo,
       ),
       GridColumnConfig<ArrivalTaskDetail>(
         name: 'supplier',
