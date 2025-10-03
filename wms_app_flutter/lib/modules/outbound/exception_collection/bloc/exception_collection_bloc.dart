@@ -28,7 +28,7 @@ class ExceptionCollectionBloc
     on<ExceptionClearMessageEvent>(_onClearMessage);
   }
 
-  FutureOr<void> _onInitialize(
+  void _onInitialize(
     InitializeExceptionCollectionEvent event,
     Emitter<ExceptionCollectionState> emit,
   ) {
@@ -47,7 +47,7 @@ class ExceptionCollectionBloc
     emit(nextState);
   }
 
-  FutureOr<void> _onTypeChanged(
+  void _onTypeChanged(
     ExceptionTypeChangedEvent event,
     Emitter<ExceptionCollectionState> emit,
   ) {
@@ -261,14 +261,14 @@ class ExceptionCollectionBloc
     return nextState;
   }
 
-  FutureOr<void> _onSelectionChanged(
+  void _onSelectionChanged(
     ExceptionSelectionChangedEvent event,
     Emitter<ExceptionCollectionState> emit,
   ) {
     emit(state.copyWith(selectedIds: List.unmodifiable(event.selectedIds)));
   }
 
-  FutureOr<void> _onDeleteSelected(
+  void _onDeleteSelected(
     ExceptionDeleteSelectedEvent event,
     Emitter<ExceptionCollectionState> emit,
   ) {
@@ -339,14 +339,14 @@ class ExceptionCollectionBloc
     }
   }
 
-  FutureOr<void> _onClearError(
+  void _onClearError(
     ExceptionClearErrorEvent event,
     Emitter<ExceptionCollectionState> emit,
   ) {
     emit(state.copyWith(error: null));
   }
 
-  FutureOr<void> _onClearMessage(
+  void _onClearMessage(
     ExceptionClearMessageEvent event,
     Emitter<ExceptionCollectionState> emit,
   ) {

@@ -9,8 +9,8 @@ import 'package:wms_app/modules/asrs_inventory/services/asrs_inventory_service.d
 class AsrsInventoryCommandBloc
     extends Bloc<AsrsInventoryCommandEvent, AsrsInventoryCommandState> {
   AsrsInventoryCommandBloc({required AsrsInventoryService service})
-      : _service = service,
-        super(const AsrsInventoryCommandState()) {
+    : _service = service,
+      super(const AsrsInventoryCommandState()) {
     on<AsrsInventoryCommandStarted>(_onStarted);
     on<AsrsInventoryCommandTrayChanged>(_onTrayChanged);
     on<AsrsInventoryCommandStartChanged>(_onStartChanged);
@@ -43,35 +43,35 @@ class AsrsInventoryCommandBloc
     await _loadHistory(emit, task: event.task);
   }
 
-  FutureOr<void> _onTrayChanged(
+  void _onTrayChanged(
     AsrsInventoryCommandTrayChanged event,
     Emitter<AsrsInventoryCommandState> emit,
   ) {
     emit(state.copyWith(trayNo: event.trayNo));
   }
 
-  FutureOr<void> _onStartChanged(
+  void _onStartChanged(
     AsrsInventoryCommandStartChanged event,
     Emitter<AsrsInventoryCommandState> emit,
   ) {
     emit(state.copyWith(startAddress: event.address));
   }
 
-  FutureOr<void> _onEndChanged(
+  void _onEndChanged(
     AsrsInventoryCommandEndChanged event,
     Emitter<AsrsInventoryCommandState> emit,
   ) {
     emit(state.copyWith(endAddress: event.address));
   }
 
-  FutureOr<void> _onTypeChanged(
+  void _onTypeChanged(
     AsrsInventoryCommandTypeChanged event,
     Emitter<AsrsInventoryCommandState> emit,
   ) {
     emit(state.copyWith(commandType: event.type));
   }
 
-  FutureOr<void> _onSingleFlagChanged(
+  void _onSingleFlagChanged(
     AsrsInventoryCommandSingleFlagChanged event,
     Emitter<AsrsInventoryCommandState> emit,
   ) {
@@ -116,11 +116,7 @@ class AsrsInventoryCommandBloc
           endAddress: state.endAddress,
         );
       }
-      await _loadHistory(
-        emit,
-        task: task,
-        successMessage: '指令下发成功',
-      );
+      await _loadHistory(emit, task: task, successMessage: '指令下发成功');
     } catch (e) {
       emit(
         state.copyWith(
@@ -140,7 +136,7 @@ class AsrsInventoryCommandBloc
     await _loadHistory(emit, task: task);
   }
 
-  FutureOr<void> _onMessagesCleared(
+  void _onMessagesCleared(
     AsrsInventoryCommandMessagesCleared event,
     Emitter<AsrsInventoryCommandState> emit,
   ) {

@@ -52,7 +52,7 @@ class _TaskMessageViewState extends State<_TaskMessageView> {
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<TaskMessageBloc>();
+    _bloc = BlocProvider.of<TaskMessageBloc>(context);
     _gridBloc = _bloc.gridBloc;
 
     _scanSubscription = ScannerService.instance.stream.listen((code) {
@@ -81,15 +81,15 @@ class _TaskMessageViewState extends State<_TaskMessageView> {
         BlocConsumer<TaskMessageBloc, TaskMessageState>(
           listener: (context, state) {
             if (state.successMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.successMessage!)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
               _bloc.add(const TaskMessageClearFeedback());
             }
             if (state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage!)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
               _bloc.add(const TaskMessageClearFeedback());
             }
           },
@@ -132,15 +132,15 @@ class _TaskMessageViewState extends State<_TaskMessageView> {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: () =>
-                _bloc.add(TaskMessageSearchSubmitted(_searchController.text.trim())),
+            onPressed: () => _bloc.add(
+              TaskMessageSearchSubmitted(_searchController.text.trim()),
+            ),
             child: const Text('查询'),
           ),
           const SizedBox(width: 12),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                _bloc.add(const TaskMessageRefreshRequested()),
+            onPressed: () => _bloc.add(const TaskMessageRefreshRequested()),
           ),
         ],
       ),
@@ -150,42 +150,43 @@ class _TaskMessageViewState extends State<_TaskMessageView> {
   Widget _buildGrid() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<ExceptionTaskMessage>,
-          CommonDataGridState<ExceptionTaskMessage>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<ExceptionTaskMessage>,
+            CommonDataGridState<ExceptionTaskMessage>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error && state.errorMessage != null) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage!,
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<ExceptionTaskMessage>(
-            columns: TaskMessageGridConfig.buildColumns(_onOperate),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<ExceptionTaskMessage>(pageIndex));
+              if (state.status == GridStatus.error &&
+                  state.errorMessage != null) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage!,
+                );
+              }
             },
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<ExceptionTaskMessage>(
+                columns: TaskMessageGridConfig.buildColumns(_onOperate),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<ExceptionTaskMessage>(pageIndex));
+                },
+              );
+            },
+          ),
     );
   }
 
-  void _onOperate(
-    ExceptionTaskMessage message,
-    TaskMessageOperationType type,
-  ) {
+  void _onOperate(ExceptionTaskMessage message, TaskMessageOperationType type) {
     switch (type) {
       case TaskMessageOperationType.confirm:
         _bloc.add(TaskMessageConfirmRequested(message));

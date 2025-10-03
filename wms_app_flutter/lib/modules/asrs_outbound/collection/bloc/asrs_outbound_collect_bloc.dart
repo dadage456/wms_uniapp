@@ -9,8 +9,8 @@ import 'package:wms_app/modules/asrs_outbound/services/asrs_outbound_service.dar
 class AsrsOutboundCollectBloc
     extends Bloc<AsrsOutboundCollectEvent, AsrsOutboundCollectState> {
   AsrsOutboundCollectBloc({required AsrsOutboundService service})
-      : _service = service,
-        super(const AsrsOutboundCollectState()) {
+    : _service = service,
+      super(const AsrsOutboundCollectState()) {
     on<AsrsOutboundCollectStarted>(_onStarted);
     on<AsrsOutboundCollectDetailSelected>(_onDetailSelected);
     on<AsrsOutboundCollectScanReceived>(_onScanReceived);
@@ -27,9 +27,13 @@ class AsrsOutboundCollectBloc
     AsrsOutboundCollectStarted event,
     Emitter<AsrsOutboundCollectState> emit,
   ) async {
-    emit(const AsrsOutboundCollectState(status: AsrsOutboundCollectStatus.loading));
+    emit(
+      const AsrsOutboundCollectState(status: AsrsOutboundCollectStatus.loading),
+    );
     try {
-      final details = await _service.fetchTaskDetails(taskId: event.task.taskId);
+      final details = await _service.fetchTaskDetails(
+        taskId: event.task.taskId,
+      );
       emit(
         state.copyWith(
           status: AsrsOutboundCollectStatus.ready,
@@ -55,7 +59,7 @@ class AsrsOutboundCollectBloc
     }
   }
 
-  FutureOr<void> _onDetailSelected(
+  void _onDetailSelected(
     AsrsOutboundCollectDetailSelected event,
     Emitter<AsrsOutboundCollectState> emit,
   ) {
@@ -94,14 +98,12 @@ class AsrsOutboundCollectBloc
           throw Exception('库位条码不合法');
         }
         emit(
-          state
-              .clearMessages()
-              .copyWith(
-                storeSite: site,
-                step: AsrsCollectStep.scanTray,
-                clearScanField: true,
-                focusQuantity: false,
-              ),
+          state.clearMessages().copyWith(
+            storeSite: site,
+            step: AsrsCollectStep.scanTray,
+            clearScanField: true,
+            focusQuantity: false,
+          ),
         );
         return;
       }
@@ -111,14 +113,12 @@ class AsrsOutboundCollectBloc
           throw Exception('请先扫描库位');
         }
         emit(
-          state
-              .clearMessages()
-              .copyWith(
-                trayNo: code,
-                step: AsrsCollectStep.scanMaterial,
-                clearScanField: true,
-                focusQuantity: false,
-              ),
+          state.clearMessages().copyWith(
+            trayNo: code,
+            step: AsrsCollectStep.scanMaterial,
+            clearScanField: true,
+            focusQuantity: false,
+          ),
         );
         return;
       }
@@ -140,10 +140,13 @@ class AsrsOutboundCollectBloc
           materialCode: material.materialCode,
           batchNo: material.batchNo.isEmpty ? null : material.batchNo,
           serialNo: material.serialNo.isEmpty ? null : material.serialNo,
-          storeRoomNo: material.erpStoreRoom.isEmpty ? null : material.erpStoreRoom,
+          storeRoomNo: material.erpStoreRoom.isEmpty
+              ? null
+              : material.erpStoreRoom,
         );
-        final inventory =
-            inventoryList.isNotEmpty ? inventoryList.first.availableQty : 0;
+        final double inventory = inventoryList.isNotEmpty
+            ? inventoryList.first.availableQty
+            : 0;
         final matchedDetail = _matchDetail(material) ?? state.selectedDetail;
         emit(
           state.copyWith(
@@ -171,7 +174,7 @@ class AsrsOutboundCollectBloc
     }
   }
 
-  FutureOr<void> _onQuantitySubmitted(
+  void _onQuantitySubmitted(
     AsrsOutboundCollectQuantitySubmitted event,
     Emitter<AsrsOutboundCollectState> emit,
   ) {
@@ -222,7 +225,7 @@ class AsrsOutboundCollectBloc
     );
   }
 
-  FutureOr<void> _onRecordRemoved(
+  void _onRecordRemoved(
     AsrsOutboundCollectRecordRemoved event,
     Emitter<AsrsOutboundCollectState> emit,
   ) {
@@ -255,7 +258,9 @@ class AsrsOutboundCollectBloc
     );
 
     try {
-      final downShelves = state.records.map((e) => e.toDownShelvesJson()).toList();
+      final downShelves = state.records
+          .map((e) => e.toDownShelvesJson())
+          .toList();
       final itemInfos = state.records.map((record) {
         AsrsOutboundTaskDetail? detail;
         try {
@@ -263,7 +268,8 @@ class AsrsOutboundCollectBloc
             (d) => d.taskItemId == record.taskItemId,
           );
         } catch (_) {
-          detail = state.selectedDetail ??
+          detail =
+              state.selectedDetail ??
               (state.details.isNotEmpty ? state.details.first : null);
         }
         if (detail == null) {
@@ -279,7 +285,9 @@ class AsrsOutboundCollectBloc
         downShelvesInfos: downShelves,
         itemListInfos: itemInfos,
       );
-      final refreshed = await _service.fetchTaskDetails(taskId: state.task!.taskId);
+      final refreshed = await _service.fetchTaskDetails(
+        taskId: state.task!.taskId,
+      );
       emit(
         state.copyWith(
           status: AsrsOutboundCollectStatus.success,
@@ -304,7 +312,7 @@ class AsrsOutboundCollectBloc
     }
   }
 
-  FutureOr<void> _onResetRequested(
+  void _onResetRequested(
     AsrsOutboundCollectResetRequested event,
     Emitter<AsrsOutboundCollectState> emit,
   ) {
@@ -322,7 +330,7 @@ class AsrsOutboundCollectBloc
     );
   }
 
-  FutureOr<void> _onMessageCleared(
+  void _onMessageCleared(
     AsrsOutboundCollectMessageCleared event,
     Emitter<AsrsOutboundCollectState> emit,
   ) {
@@ -339,7 +347,9 @@ class AsrsOutboundCollectBloc
 
   bool _looksLikeTray(String code) {
     final upper = code.toUpperCase();
-    return upper.startsWith('TP') || upper.startsWith('TR') || upper.contains('TRAY');
+    return upper.startsWith('TP') ||
+        upper.startsWith('TR') ||
+        upper.contains('TRAY');
   }
 
   AsrsOutboundTaskDetail? _matchDetail(AsrsMaterialInfo material) {

@@ -10,19 +10,21 @@ class AsrsOutboundTaskListPage extends StatefulWidget {
   const AsrsOutboundTaskListPage({super.key});
 
   @override
-  State<AsrsOutboundTaskListPage> createState() => _AsrsOutboundTaskListPageState();
+  State<AsrsOutboundTaskListPage> createState() =>
+      _AsrsOutboundTaskListPageState();
 }
 
 class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
   late final TextEditingController _keywordController;
+  late final AsrsOutboundListBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     _keywordController = TextEditingController();
-    context
-        .read<AsrsOutboundListBloc>()
-        .add(const AsrsOutboundListInitialized());
+    _bloc = BlocProvider.of<AsrsOutboundListBloc>(context);
+    // 初始化加载任务列表
+    _bloc.add(const AsrsOutboundListInitialized());
   }
 
   @override
@@ -39,13 +41,13 @@ class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
           previous.successMessage != current.successMessage,
       listener: (context, state) {
         if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         } else if (state.successMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.successMessage!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
         }
       },
       child: Scaffold(
@@ -55,9 +57,7 @@ class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () {
-                context
-                    .read<AsrsOutboundListBloc>()
-                    .add(const AsrsOutboundListRefreshed());
+                _bloc.add(const AsrsOutboundListRefreshed());
               },
             ),
           ],
@@ -70,8 +70,10 @@ class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
                   previous.keyword != current.keyword,
               builder: (context, state) {
                 return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: TextField(
                     controller: _keywordController,
                     decoration: InputDecoration(
@@ -82,9 +84,7 @@ class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
                       ),
                     ),
                     onSubmitted: (value) {
-                      context
-                          .read<AsrsOutboundListBloc>()
-                          .add(AsrsOutboundListKeywordChanged(value.trim()));
+                      _bloc.add(AsrsOutboundListKeywordChanged(value.trim()));
                     },
                   ),
                 );
@@ -97,9 +97,7 @@ class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (state.status == AsrsOutboundListStatus.failure) {
-                    return Center(
-                      child: Text(state.errorMessage ?? '加载失败'),
-                    );
+                    return Center(child: Text(state.errorMessage ?? '加载失败'));
                   }
                   if (state.tasks.isEmpty) {
                     return const Center(child: Text('暂无待处理任务'));
@@ -110,18 +108,12 @@ class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
                       final task = state.tasks[index];
                       return _TaskCard(
                         task: task,
-                        onViewDetail: () => Modular.to.pushNamed(
-                          './detail',
-                          arguments: task,
-                        ),
-                        onCollect: () => Modular.to.pushNamed(
-                          './collect',
-                          arguments: task,
-                        ),
-                        onCommand: () => Modular.to.pushNamed(
-                          './commands',
-                          arguments: task,
-                        ),
+                        onViewDetail: () =>
+                            Modular.to.pushNamed('./detail', arguments: task),
+                        onCollect: () =>
+                            Modular.to.pushNamed('./collect', arguments: task),
+                        onCommand: () =>
+                            Modular.to.pushNamed('./commands', arguments: task),
                       );
                     },
                     separatorBuilder: (_, __) => const SizedBox(height: 8),
@@ -150,11 +142,9 @@ class _AsrsOutboundTaskListPageState extends State<AsrsOutboundTaskListPage> {
     return IconButton(
       icon: const Icon(Icons.search),
       onPressed: () {
-        context.read<AsrsOutboundListBloc>().add(
-              AsrsOutboundListKeywordChanged(
-                _keywordController.text.trim(),
-              ),
-            );
+        _bloc.add(
+          AsrsOutboundListKeywordChanged(_keywordController.text.trim()),
+        );
       },
     );
   }
@@ -190,8 +180,10 @@ class _TaskCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.indigo.shade50,
                     borderRadius: BorderRadius.circular(12),

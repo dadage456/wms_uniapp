@@ -10,16 +10,19 @@ class AsrsInboundTaskListPage extends StatefulWidget {
   const AsrsInboundTaskListPage({super.key});
 
   @override
-  State<AsrsInboundTaskListPage> createState() => _AsrsInboundTaskListPageState();
+  State<AsrsInboundTaskListPage> createState() =>
+      _AsrsInboundTaskListPageState();
 }
 
 class _AsrsInboundTaskListPageState extends State<AsrsInboundTaskListPage> {
   late final TextEditingController _keywordController;
+  late final AsrsInboundListBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     _keywordController = TextEditingController();
+    _bloc = BlocProvider.of<AsrsInboundListBloc>(context);
   }
 
   @override
@@ -36,13 +39,13 @@ class _AsrsInboundTaskListPageState extends State<AsrsInboundTaskListPage> {
           previous.successMessage != current.successMessage,
       listener: (context, state) {
         if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         } else if (state.successMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.successMessage!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
         }
       },
       child: Scaffold(
@@ -52,9 +55,7 @@ class _AsrsInboundTaskListPageState extends State<AsrsInboundTaskListPage> {
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () {
-                context
-                    .read<AsrsInboundListBloc>()
-                    .add(const AsrsInboundListRefreshed());
+                _bloc.add(const AsrsInboundListRefreshed());
               },
             ),
           ],
@@ -72,9 +73,8 @@ class _AsrsInboundTaskListPageState extends State<AsrsInboundTaskListPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onSubmitted: (value) => context.read<AsrsInboundListBloc>().add(
-                      AsrsInboundListKeywordChanged(value.trim()),
-                    ),
+                onSubmitted: (value) =>
+                    _bloc.add(AsrsInboundListKeywordChanged(value.trim())),
               ),
             ),
             Expanded(
@@ -84,18 +84,15 @@ class _AsrsInboundTaskListPageState extends State<AsrsInboundTaskListPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (state.status == AsrsInboundListStatus.failure) {
-                    return Center(
-                      child: Text(state.errorMessage ?? '加载失败'),
-                    );
+                    return Center(child: Text(state.errorMessage ?? '加载失败'));
                   }
                   if (state.tasks.isEmpty) {
                     return const Center(child: Text('暂无待处理任务'));
                   }
 
                   return RefreshIndicator(
-                    onRefresh: () async => context
-                        .read<AsrsInboundListBloc>()
-                        .add(const AsrsInboundListRefreshed()),
+                    onRefresh: () async =>
+                        _bloc.add(const AsrsInboundListRefreshed()),
                     child: ListView.separated(
                       padding: const EdgeInsets.only(bottom: 24),
                       itemBuilder: (context, index) {
@@ -131,11 +128,9 @@ class _AsrsInboundTaskListPageState extends State<AsrsInboundTaskListPage> {
         }
         return IconButton(
           icon: const Icon(Icons.search),
-          onPressed: () => context.read<AsrsInboundListBloc>().add(
-                AsrsInboundListKeywordChanged(
-                  _keywordController.text.trim(),
-                ),
-              ),
+          onPressed: () => _bloc.add(
+            AsrsInboundListKeywordChanged(_keywordController.text.trim()),
+          ),
         );
       },
     );
@@ -167,9 +162,7 @@ class _TaskCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Chip(
-                  label: Text(task.status.isEmpty ? '待处理' : task.status),
-                ),
+                Chip(label: Text(task.status.isEmpty ? '待处理' : task.status)),
               ],
             ),
             const SizedBox(height: 8),
@@ -190,26 +183,20 @@ class _TaskCard extends StatelessWidget {
                 _ActionButton(
                   icon: Icons.list_alt,
                   label: '任务明细',
-                  onTap: () => Modular.to.pushNamed(
-                    './detail',
-                    arguments: task,
-                  ),
+                  onTap: () =>
+                      Modular.to.pushNamed('./detail', arguments: task),
                 ),
                 _ActionButton(
                   icon: Icons.qr_code_scanner,
                   label: '采集上架',
-                  onTap: () => Modular.to.pushNamed(
-                    './collect',
-                    arguments: task,
-                  ),
+                  onTap: () =>
+                      Modular.to.pushNamed('./collect', arguments: task),
                 ),
                 _ActionButton(
                   icon: Icons.play_circle,
                   label: 'WCS指令',
-                  onTap: () => Modular.to.pushNamed(
-                    './commands',
-                    arguments: task,
-                  ),
+                  onTap: () =>
+                      Modular.to.pushNamed('./commands', arguments: task),
                 ),
               ],
             ),

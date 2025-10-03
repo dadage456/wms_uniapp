@@ -33,7 +33,7 @@ class _ExceptionTaskListPageState extends State<ExceptionTaskListPage> {
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<ExceptionTaskListBloc>();
+    _bloc = BlocProvider.of<ExceptionTaskListBloc>(context);
     _gridBloc = _bloc.gridBloc;
     _gridBloc.add(const LoadDataEvent<ExceptionTaskRecord>(1));
 
@@ -71,15 +71,15 @@ class _ExceptionTaskListPageState extends State<ExceptionTaskListPage> {
       body: BlocListener<ExceptionTaskListBloc, ExceptionTaskListState>(
         listener: (context, state) {
           if (state.successMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.successMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
             _bloc.add(const ExceptionTaskListMessageCleared());
           }
           if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
             _bloc.add(const ExceptionTaskListMessageCleared());
           }
         },
@@ -115,8 +115,8 @@ class _ExceptionTaskListPageState extends State<ExceptionTaskListPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onSubmitted: (value) => _bloc
-                  .add(ExceptionTaskListSearchSubmitted(value.trim())),
+              onSubmitted: (value) =>
+                  _bloc.add(ExceptionTaskListSearchSubmitted(value.trim())),
             ),
           ),
           const SizedBox(width: 12),
@@ -134,35 +134,39 @@ class _ExceptionTaskListPageState extends State<ExceptionTaskListPage> {
   Widget _buildGrid() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<ExceptionTaskRecord>,
-          CommonDataGridState<ExceptionTaskRecord>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<ExceptionTaskRecord>,
+            CommonDataGridState<ExceptionTaskRecord>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error && state.errorMessage != null) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage!,
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<ExceptionTaskRecord>(
-            columns: ExceptionTaskGridConfig.buildColumns(_onOperate),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<ExceptionTaskRecord>(pageIndex));
+              if (state.status == GridStatus.error &&
+                  state.errorMessage != null) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage!,
+                );
+              }
             },
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<ExceptionTaskRecord>(
+                columns: ExceptionTaskGridConfig.buildColumns(_onOperate),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<ExceptionTaskRecord>(pageIndex));
+                },
+              );
+            },
+          ),
     );
   }
 

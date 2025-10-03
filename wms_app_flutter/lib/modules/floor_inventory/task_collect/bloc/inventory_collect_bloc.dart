@@ -8,8 +8,8 @@ import 'package:wms_app/modules/floor_inventory/task_details/models/inventory_ta
 class InventoryCollectBloc
     extends Bloc<InventoryCollectEvent, InventoryCollectState> {
   InventoryCollectBloc({required FloorInventoryService service})
-      : _service = service,
-        super(const InventoryCollectState()) {
+    : _service = service,
+      super(const InventoryCollectState()) {
     on<InventoryCollectStarted>(_onStarted);
     on<InventoryCollectRefreshRequested>(_onRefreshRequested);
     on<InventoryCollectTabChanged>(_onTabChanged);
@@ -117,25 +117,25 @@ class InventoryCollectBloc
     InventoryCollectRecordRemoved event,
     Emitter<InventoryCollectState> emit,
   ) async {
-    final updatedRecords = List<InventoryCollectionRecord>.from(state.collectRecords);
-    final index = updatedRecords.indexWhere((record) => record.isSameTarget(event.record));
+    final updatedRecords = List<InventoryCollectionRecord>.from(
+      state.collectRecords,
+    );
+    final index = updatedRecords.indexWhere(
+      (record) => record.isSameTarget(event.record),
+    );
     if (index < 0) {
       return;
     }
 
     final removed = updatedRecords.removeAt(index);
-    final updatedDetails = state.taskItems
-        .map(
-          (detail) {
-            if (detail.detailId == removed.invTaskItemId) {
-              final newQty = detail.collectedQty - removed.collectQty;
-              final adjusted = newQty < 0 ? 0 : newQty;
-              return detail.copyWith(collectedQty: adjusted);
-            }
-            return detail;
-          },
-        )
-        .toList();
+    final updatedDetails = state.taskItems.map((detail) {
+      if (detail.detailId == removed.invTaskItemId) {
+        final newQty = detail.collectedQty - removed.collectQty;
+        final double adjusted = newQty < 0 ? 0 : newQty;
+        return detail.copyWith(collectedQty: adjusted);
+      }
+      return detail;
+    }).toList();
 
     emit(
       state.copyWith(
@@ -301,7 +301,11 @@ class InventoryCollectBloc
 
     try {
       final material = await _service.getMaterialInfoByQr(code);
-      final detail = _findDetail(material, state.currentStoreSite, state.taskItems);
+      final detail = _findDetail(
+        material,
+        state.currentStoreSite,
+        state.taskItems,
+      );
       if (detail == null) {
         emit(state.copyWith(errorMessage: '物料【${material.matCode}】不在盘点任务清单'));
         return;
@@ -345,9 +349,12 @@ class InventoryCollectBloc
       return;
     }
 
-    final matchedDetail = detail ?? _findDetail(currentMaterial, storeSite, state.taskItems);
+    final matchedDetail =
+        detail ?? _findDetail(currentMaterial, storeSite, state.taskItems);
     if (matchedDetail == null) {
-      emit(state.copyWith(errorMessage: '物料【${currentMaterial.matCode}】不在盘点任务清单'));
+      emit(
+        state.copyWith(errorMessage: '物料【${currentMaterial.matCode}】不在盘点任务清单'),
+      );
       return;
     }
 
@@ -358,8 +365,9 @@ class InventoryCollectBloc
       taskComment: task.taskComment,
       taskNo: task.taskNo,
       invTaskItemId: matchedDetail.detailId,
-      storeRoomNo:
-          matchedDetail.storeRoomNo.isNotEmpty ? matchedDetail.storeRoomNo : task.storeRoomNo,
+      storeRoomNo: matchedDetail.storeRoomNo.isNotEmpty
+          ? matchedDetail.storeRoomNo
+          : task.storeRoomNo,
       storeSiteNo: storeSite,
       matCode: currentMaterial.matCode,
       matName: currentMaterial.matName,
@@ -369,12 +377,17 @@ class InventoryCollectBloc
       materialId: currentMaterial.materialId,
     );
 
-    final updatedRecords = List<InventoryCollectionRecord>.from(state.collectRecords);
-    final index = updatedRecords.indexWhere((element) => element.isSameTarget(record));
+    final updatedRecords = List<InventoryCollectionRecord>.from(
+      state.collectRecords,
+    );
+    final index = updatedRecords.indexWhere(
+      (element) => element.isSameTarget(record),
+    );
     if (index >= 0) {
       final existing = updatedRecords[index];
-      updatedRecords[index] =
-          existing.copyWith(collectQty: existing.collectQty + quantity);
+      updatedRecords[index] = existing.copyWith(
+        collectQty: existing.collectQty + quantity,
+      );
     } else {
       updatedRecords.add(record);
     }
@@ -438,7 +451,8 @@ class InventoryCollectBloc
 
     match = _firstWhere(
       details,
-      (item) => item.storeSite == storeSite && item.materialCode == material.matCode,
+      (item) =>
+          item.storeSite == storeSite && item.materialCode == material.matCode,
     );
     if (match != null) {
       return match;

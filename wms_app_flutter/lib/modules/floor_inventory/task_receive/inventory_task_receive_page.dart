@@ -20,7 +20,8 @@ class InventoryTaskReceivePage extends StatefulWidget {
   const InventoryTaskReceivePage({super.key});
 
   @override
-  State<InventoryTaskReceivePage> createState() => _InventoryTaskReceivePageState();
+  State<InventoryTaskReceivePage> createState() =>
+      _InventoryTaskReceivePageState();
 }
 
 class _InventoryTaskReceivePageState extends State<InventoryTaskReceivePage> {
@@ -32,7 +33,7 @@ class _InventoryTaskReceivePageState extends State<InventoryTaskReceivePage> {
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<InventoryTaskReceiveBloc>();
+    _bloc = BlocProvider.of<InventoryTaskReceiveBloc>(context);
     _gridBloc = _bloc.gridBloc;
 
     _scanSubscription = ScannerService.instance.stream.listen((code) {
@@ -69,15 +70,15 @@ class _InventoryTaskReceivePageState extends State<InventoryTaskReceivePage> {
       body: BlocListener<InventoryTaskReceiveBloc, InventoryTaskReceiveState>(
         listener: (context, state) {
           if (state.successMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.successMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
             _bloc.add(const InventoryTaskReceiveMessageCleared());
           }
           if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
             _bloc.add(const InventoryTaskReceiveMessageCleared());
           }
         },
@@ -119,8 +120,11 @@ class _InventoryTaskReceivePageState extends State<InventoryTaskReceivePage> {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: () =>
-                _bloc.add(InventoryTaskReceiveSearchSubmitted(_searchController.text.trim())),
+            onPressed: () => _bloc.add(
+              InventoryTaskReceiveSearchSubmitted(
+                _searchController.text.trim(),
+              ),
+            ),
             child: const Text('查询'),
           ),
         ],
@@ -131,35 +135,41 @@ class _InventoryTaskReceivePageState extends State<InventoryTaskReceivePage> {
   Widget _buildGrid() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<InventoryTask>,
-          CommonDataGridState<InventoryTask>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<InventoryTask>,
+            CommonDataGridState<InventoryTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error && state.errorMessage != null) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage!,
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<InventoryTask>(
-            columns: InventoryTaskGridConfig.buildReceiveColumns(_onOperate),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<InventoryTask>(pageIndex));
+              if (state.status == GridStatus.error &&
+                  state.errorMessage != null) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage!,
+                );
+              }
             },
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<InventoryTask>(
+                columns: InventoryTaskGridConfig.buildReceiveColumns(
+                  _onOperate,
+                ),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<InventoryTask>(pageIndex));
+                },
+              );
+            },
+          ),
     );
   }
 
@@ -186,7 +196,9 @@ class _InventoryTaskReceivePageState extends State<InventoryTaskReceivePage> {
       builder: (context) {
         return AlertDialog(
           title: const Text('接收确认'),
-          content: Text('确定接收盘库任务 ${task.taskNo.isNotEmpty ? task.taskNo : task.taskComment} 吗？'),
+          content: Text(
+            '确定接收盘库任务 ${task.taskNo.isNotEmpty ? task.taskNo : task.taskComment} 吗？',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),

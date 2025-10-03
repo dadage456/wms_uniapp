@@ -8,8 +8,8 @@ import 'package:wms_app/modules/asrs_outbound/services/asrs_outbound_service.dar
 
 class AsrsCommandBloc extends Bloc<AsrsCommandEvent, AsrsCommandState> {
   AsrsCommandBloc({required AsrsOutboundService service})
-      : _service = service,
-        super(const AsrsCommandState()) {
+    : _service = service,
+      super(const AsrsCommandState()) {
     on<AsrsCommandInitialized>(_onInitialized);
     on<AsrsCommandTypeChanged>(_onTypeChanged);
     on<AsrsCommandTrayChanged>(_onTrayChanged);
@@ -38,11 +38,11 @@ class AsrsCommandBloc extends Bloc<AsrsCommandEvent, AsrsCommandState> {
           outLocations: outLocations,
           inLocations: inLocations,
           palletSites: palletSites,
-          startAddress: outLocations.isNotEmpty ? outLocations.first.address : '',
-          endAddress: inLocations.isNotEmpty ? inLocations.first.address : '',
-          trayNo: event.task.projectNum.isNotEmpty
-              ? event.task.projectNum
+          startAddress: outLocations.isNotEmpty
+              ? outLocations.first.address
               : '',
+          endAddress: inLocations.isNotEmpty ? inLocations.first.address : '',
+          trayNo: event.task.projectNum.isNotEmpty ? event.task.projectNum : '',
         ),
       );
     } catch (e) {
@@ -55,42 +55,42 @@ class AsrsCommandBloc extends Bloc<AsrsCommandEvent, AsrsCommandState> {
     }
   }
 
-  FutureOr<void> _onTypeChanged(
+  void _onTypeChanged(
     AsrsCommandTypeChanged event,
     Emitter<AsrsCommandState> emit,
   ) {
     emit(state.copyWith(type: event.type));
   }
 
-  FutureOr<void> _onTrayChanged(
+  void _onTrayChanged(
     AsrsCommandTrayChanged event,
     Emitter<AsrsCommandState> emit,
   ) {
     emit(state.copyWith(trayNo: event.trayNo));
   }
 
-  FutureOr<void> _onStartChanged(
+  void _onStartChanged(
     AsrsCommandStartChanged event,
     Emitter<AsrsCommandState> emit,
   ) {
     emit(state.copyWith(startAddress: event.address));
   }
 
-  FutureOr<void> _onEndChanged(
+  void _onEndChanged(
     AsrsCommandEndChanged event,
     Emitter<AsrsCommandState> emit,
   ) {
     emit(state.copyWith(endAddress: event.address));
   }
 
-  FutureOr<void> _onSingleFlagChanged(
+  void _onSingleFlagChanged(
     AsrsCommandSingleFlagChanged event,
     Emitter<AsrsCommandState> emit,
   ) {
     emit(state.copyWith(singleFlag: event.flag));
   }
 
-  FutureOr<void> _onApplyLocation(
+  void _onApplyLocation(
     AsrsCommandApplyLocation event,
     Emitter<AsrsCommandState> emit,
   ) {
@@ -151,7 +151,7 @@ class AsrsCommandBloc extends Bloc<AsrsCommandEvent, AsrsCommandState> {
     }
   }
 
-  FutureOr<void> _onMessageCleared(
+  void _onMessageCleared(
     AsrsCommandMessageCleared event,
     Emitter<AsrsCommandState> emit,
   ) {

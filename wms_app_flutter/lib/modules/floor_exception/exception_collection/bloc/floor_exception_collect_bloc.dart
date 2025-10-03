@@ -12,8 +12,8 @@ import 'package:wms_app/modules/outbound/collection_task/models/collection_model
 class FloorExceptionCollectBloc
     extends Bloc<FloorExceptionCollectEvent, FloorExceptionCollectState> {
   FloorExceptionCollectBloc({required FloorExceptionService service})
-      : _service = service,
-        super(const FloorExceptionCollectState()) {
+    : _service = service,
+      super(const FloorExceptionCollectState()) {
     on<FloorExceptionInitializeEvent>(_onInitialize);
     on<FloorExceptionTypeChangedEvent>(_onTypeChanged);
     on<FloorExceptionPerformScanEvent>(_onPerformScan);
@@ -27,7 +27,7 @@ class FloorExceptionCollectBloc
   final FloorExceptionService _service;
   FloorExceptionTaskSummary _summary = const FloorExceptionTaskSummary();
 
-  FutureOr<void> _onInitialize(
+  void _onInitialize(
     FloorExceptionInitializeEvent event,
     Emitter<FloorExceptionCollectState> emit,
   ) {
@@ -49,16 +49,11 @@ class FloorExceptionCollectBloc
     emit(nextState);
   }
 
-  FutureOr<void> _onTypeChanged(
+  void _onTypeChanged(
     FloorExceptionTypeChangedEvent event,
     Emitter<FloorExceptionCollectState> emit,
   ) {
-    emit(
-      state.copyWith(
-        exceptionType: event.type,
-        exceptionName: event.name,
-      ),
-    );
+    emit(state.copyWith(exceptionType: event.type, exceptionName: event.name));
   }
 
   Future<void> _onPerformScan(
@@ -267,14 +262,14 @@ class FloorExceptionCollectBloc
     return nextState;
   }
 
-  FutureOr<void> _onSelectionChanged(
+  void _onSelectionChanged(
     FloorExceptionSelectionChangedEvent event,
     Emitter<FloorExceptionCollectState> emit,
   ) {
     emit(state.copyWith(selectedIds: List.unmodifiable(event.selectedIds)));
   }
 
-  FutureOr<void> _onDeleteSelected(
+  void _onDeleteSelected(
     FloorExceptionDeleteSelectedEvent event,
     Emitter<FloorExceptionCollectState> emit,
   ) {
@@ -284,10 +279,12 @@ class FloorExceptionCollectBloc
     }
 
     final idSet = state.selectedIds.toSet();
-    final remainingItems =
-        state.items.where((item) => !idSet.contains(item.id)).toList();
-    final remainingStocks =
-        state.stocks.where((stock) => !idSet.contains(stock.id)).toList();
+    final remainingItems = state.items
+        .where((item) => !idSet.contains(item.id))
+        .toList();
+    final remainingStocks = state.stocks
+        .where((stock) => !idSet.contains(stock.id))
+        .toList();
 
     emit(
       state.copyWith(
@@ -314,8 +311,7 @@ class FloorExceptionCollectBloc
           .map(
             (stock) => stock.toPayload(
               taskNo: _summary.taskNo,
-              proType:
-                  _summary.proType.isNotEmpty ? _summary.proType : '异常处理',
+              proType: _summary.proType.isNotEmpty ? _summary.proType : '异常处理',
               proofNo: _summary.proofNo,
             ),
           )
@@ -340,23 +336,18 @@ class FloorExceptionCollectBloc
       clearedState = _applyPlaceholder(clearedState);
       emit(clearedState);
     } catch (e) {
-      emit(
-        state.copyWith(
-          isLoading: false,
-          error: '提交异常：${_formatError(e)}',
-        ),
-      );
+      emit(state.copyWith(isLoading: false, error: '提交异常：${_formatError(e)}'));
     }
   }
 
-  FutureOr<void> _onClearError(
+  void _onClearError(
     FloorExceptionClearErrorEvent event,
     Emitter<FloorExceptionCollectState> emit,
   ) {
     emit(state.copyWith(error: null));
   }
 
-  FutureOr<void> _onClearMessage(
+  void _onClearMessage(
     FloorExceptionClearMessageEvent event,
     Emitter<FloorExceptionCollectState> emit,
   ) {

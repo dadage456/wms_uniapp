@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wms_app/modules/asrs_inbound/models/asrs_inbound_models.dart';
 import 'package:wms_app/modules/asrs_inbound/services/asrs_inbound_service.dart';
 import 'package:wms_app/modules/asrs_inbound/task_detail/bloc/asrs_inbound_detail_event.dart';
 import 'package:wms_app/modules/asrs_inbound/task_detail/bloc/asrs_inbound_detail_state.dart';
@@ -8,8 +9,8 @@ import 'package:wms_app/modules/asrs_inbound/task_detail/bloc/asrs_inbound_detai
 class AsrsInboundDetailBloc
     extends Bloc<AsrsInboundDetailEvent, AsrsInboundDetailState> {
   AsrsInboundDetailBloc({required AsrsInboundService service})
-      : _service = service,
-        super(const AsrsInboundDetailState()) {
+    : _service = service,
+      super(const AsrsInboundDetailState()) {
     on<AsrsInboundDetailLoaded>(_onLoaded);
     on<AsrsInboundDetailSearchChanged>(
       _onSearchChanged,
@@ -26,7 +27,9 @@ class AsrsInboundDetailBloc
     AsrsInboundDetailLoaded event,
     Emitter<AsrsInboundDetailState> emit,
   ) async {
-    emit(state.copyWith(status: AsrsInboundDetailStatus.loading, task: event.task));
+    emit(
+      state.copyWith(status: AsrsInboundDetailStatus.loading, task: event.task),
+    );
     await _fetchDetail(emit, keyword: state.keyword, task: event.task);
   }
 

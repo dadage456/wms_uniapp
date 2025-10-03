@@ -10,8 +10,8 @@ import 'package:wms_app/modules/asrs_inventory/services/asrs_inventory_service.d
 class AsrsInventoryCollectBloc
     extends Bloc<AsrsInventoryCollectEvent, AsrsInventoryCollectState> {
   AsrsInventoryCollectBloc({required AsrsInventoryService service})
-      : _service = service,
-        super(const AsrsInventoryCollectState()) {
+    : _service = service,
+      super(const AsrsInventoryCollectState()) {
     on<AsrsInventoryCollectInitialized>(_onInitialized);
     on<AsrsInventoryCollectSearchChanged>(
       _onSearchChanged,
@@ -71,7 +71,7 @@ class AsrsInventoryCollectBloc
     }
   }
 
-  FutureOr<void> _onSearchChanged(
+  void _onSearchChanged(
     AsrsInventoryCollectSearchChanged event,
     Emitter<AsrsInventoryCollectState> emit,
   ) {
@@ -104,7 +104,7 @@ class AsrsInventoryCollectBloc
     );
   }
 
-  FutureOr<void> _onScanReceived(
+  void _onScanReceived(
     AsrsInventoryCollectScanReceived event,
     Emitter<AsrsInventoryCollectState> emit,
   ) {
@@ -137,7 +137,7 @@ class AsrsInventoryCollectBloc
     );
   }
 
-  FutureOr<void> _onDetailSelected(
+  void _onDetailSelected(
     AsrsInventoryCollectDetailSelected event,
     Emitter<AsrsInventoryCollectState> emit,
   ) {
@@ -152,7 +152,7 @@ class AsrsInventoryCollectBloc
     );
   }
 
-  FutureOr<void> _onQuantityChanged(
+  void _onQuantityChanged(
     AsrsInventoryCollectQuantityChanged event,
     Emitter<AsrsInventoryCollectState> emit,
   ) {
@@ -196,7 +196,7 @@ class AsrsInventoryCollectBloc
     );
   }
 
-  FutureOr<void> _onRecordRemoved(
+  void _onRecordRemoved(
     AsrsInventoryCollectRecordRemoved event,
     Emitter<AsrsInventoryCollectState> emit,
   ) {
@@ -257,7 +257,7 @@ class AsrsInventoryCollectBloc
     }
   }
 
-  FutureOr<void> _onMessagesCleared(
+  void _onMessagesCleared(
     AsrsInventoryCollectMessagesCleared event,
     Emitter<AsrsInventoryCollectState> emit,
   ) {

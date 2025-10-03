@@ -14,14 +14,15 @@ class AsrsInventoryTaskListPage extends StatefulWidget {
       _AsrsInventoryTaskListPageState();
 }
 
-class _AsrsInventoryTaskListPageState
-    extends State<AsrsInventoryTaskListPage> {
+class _AsrsInventoryTaskListPageState extends State<AsrsInventoryTaskListPage> {
   late final TextEditingController _keywordController;
+  late final AsrsInventoryListBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     _keywordController = TextEditingController();
+    _bloc = BlocProvider.of<AsrsInventoryListBloc>(context);
   }
 
   @override
@@ -38,13 +39,13 @@ class _AsrsInventoryTaskListPageState
           previous.successMessage != current.successMessage,
       listener: (context, state) {
         if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         } else if (state.successMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.successMessage!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
         }
       },
       child: Scaffold(
@@ -60,9 +61,8 @@ class _AsrsInventoryTaskListPageState
                     const Text('仅显示进行中'),
                     Switch(
                       value: state.onlyProcessing,
-                      onChanged: (value) => context
-                          .read<AsrsInventoryListBloc>()
-                          .add(AsrsInventoryListToggleProcessing(value)),
+                      onChanged: (value) =>
+                          _bloc.add(AsrsInventoryListToggleProcessing(value)),
                     ),
                   ],
                 );
@@ -70,9 +70,7 @@ class _AsrsInventoryTaskListPageState
             ),
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () => context
-                  .read<AsrsInventoryListBloc>()
-                  .add(const AsrsInventoryListRefreshed()),
+              onPressed: () => _bloc.add(const AsrsInventoryListRefreshed()),
             ),
           ],
         ),
@@ -89,9 +87,8 @@ class _AsrsInventoryTaskListPageState
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onSubmitted: (value) => context
-                    .read<AsrsInventoryListBloc>()
-                    .add(AsrsInventoryListKeywordChanged(value.trim())),
+                onSubmitted: (value) =>
+                    _bloc.add(AsrsInventoryListKeywordChanged(value.trim())),
               ),
             ),
             Expanded(
@@ -101,18 +98,15 @@ class _AsrsInventoryTaskListPageState
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (state.status == AsrsInventoryListStatus.failure) {
-                    return Center(
-                      child: Text(state.errorMessage ?? '加载失败'),
-                    );
+                    return Center(child: Text(state.errorMessage ?? '加载失败'));
                   }
                   if (state.tasks.isEmpty) {
                     return const Center(child: Text('暂无待处理任务'));
                   }
 
                   return RefreshIndicator(
-                    onRefresh: () async => context
-                        .read<AsrsInventoryListBloc>()
-                        .add(const AsrsInventoryListRefreshed()),
+                    onRefresh: () async =>
+                        _bloc.add(const AsrsInventoryListRefreshed()),
                     child: ListView.separated(
                       padding: const EdgeInsets.only(bottom: 24),
                       itemBuilder: (context, index) {
@@ -148,11 +142,9 @@ class _AsrsInventoryTaskListPageState
         }
         return IconButton(
           icon: const Icon(Icons.search),
-          onPressed: () => context.read<AsrsInventoryListBloc>().add(
-                AsrsInventoryListKeywordChanged(
-                  _keywordController.text.trim(),
-                ),
-              ),
+          onPressed: () => _bloc.add(
+            AsrsInventoryListKeywordChanged(_keywordController.text.trim()),
+          ),
         );
       },
     );
@@ -185,8 +177,9 @@ class _TaskCard extends StatelessWidget {
                 ),
                 Chip(
                   label: Text(task.isFinished ? '已完成' : '进行中'),
-                  backgroundColor:
-                      task.isFinished ? Colors.green.shade100 : Colors.blue.shade100,
+                  backgroundColor: task.isFinished
+                      ? Colors.green.shade100
+                      : Colors.blue.shade100,
                 ),
               ],
             ),

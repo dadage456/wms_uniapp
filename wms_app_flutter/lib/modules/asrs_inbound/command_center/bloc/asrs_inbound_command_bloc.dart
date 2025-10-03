@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/modules/asrs_inbound/command_center/bloc/asrs_inbound_command_event.dart';
 import 'package:wms_app/modules/asrs_inbound/command_center/bloc/asrs_inbound_command_state.dart';
+import 'package:wms_app/modules/asrs_inbound/models/asrs_inbound_models.dart';
 import 'package:wms_app/modules/asrs_inbound/services/asrs_inbound_service.dart';
 
 class AsrsInboundCommandBloc
     extends Bloc<AsrsInboundCommandEvent, AsrsInboundCommandState> {
   AsrsInboundCommandBloc({required AsrsInboundService service})
-      : _service = service,
-        super(const AsrsInboundCommandState()) {
+    : _service = service,
+      super(const AsrsInboundCommandState()) {
     on<AsrsInboundCommandStarted>(_onStarted);
     on<AsrsInboundCommandTrayChanged>(_onTrayChanged);
     on<AsrsInboundCommandStartChanged>(_onStartChanged);
@@ -24,7 +25,12 @@ class AsrsInboundCommandBloc
     AsrsInboundCommandStarted event,
     Emitter<AsrsInboundCommandState> emit,
   ) async {
-    emit(state.copyWith(status: AsrsInboundCommandStatus.loading, task: event.task));
+    emit(
+      state.copyWith(
+        status: AsrsInboundCommandStatus.loading,
+        task: event.task,
+      ),
+    );
     await _loadHistory(emit, task: event.task);
   }
 

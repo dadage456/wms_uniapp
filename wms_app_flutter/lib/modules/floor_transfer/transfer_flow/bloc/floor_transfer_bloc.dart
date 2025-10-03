@@ -9,8 +9,8 @@ import 'package:wms_app/modules/outbound/collection_task/models/collection_model
 
 class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
   FloorTransferBloc({required FloorTransferService service})
-      : _service = service,
-        super(const FloorTransferState()) {
+    : _service = service,
+      super(const FloorTransferState()) {
     on<FloorTransferInitialized>(_onInitialized);
     on<FloorTransferModeChanged>(_onModeChanged);
     on<FloorTransferScanReceived>(_onScanReceived);
@@ -32,7 +32,7 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
 
   static const _inventoryPageSize = 20;
 
-  FutureOr<void> _onInitialized(
+  void _onInitialized(
     FloorTransferInitialized event,
     Emitter<FloorTransferState> emit,
   ) {
@@ -50,25 +50,27 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
       inventoryQueryStep: 'M',
       barcodeContent: null,
     );
-    initialState = _applyPlaceholder(initialState.copyWith(
-      sourceSite: '',
-      targetSite: '',
-      storeRoom: '',
-      materialCode: '',
-      materialName: '',
-      batchNo: '',
-      serialNo: '',
-      projectNum: '',
-      erpStoreRoom: '',
-      erpOwnerCode: '',
-      quantity: 0,
-      materialControl: MaterialControl.none,
-    ));
+    initialState = _applyPlaceholder(
+      initialState.copyWith(
+        sourceSite: '',
+        targetSite: '',
+        storeRoom: '',
+        materialCode: '',
+        materialName: '',
+        batchNo: '',
+        serialNo: '',
+        projectNum: '',
+        erpStoreRoom: '',
+        erpOwnerCode: '',
+        quantity: 0,
+        materialControl: MaterialControl.none,
+      ),
+    );
     _rebuildAggregations(const []);
     emit(initialState);
   }
 
-  FutureOr<void> _onModeChanged(
+  void _onModeChanged(
     FloorTransferModeChanged event,
     Emitter<FloorTransferState> emit,
   ) {
@@ -108,7 +110,9 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
       if (code.contains(r'$KW$')) {
         emit(workingState.copyWith(isLoading: true));
         workingState = await _handleSite(workingState, code);
-        workingState = _applyPlaceholder(workingState.copyWith(isLoading: false));
+        workingState = _applyPlaceholder(
+          workingState.copyWith(isLoading: false),
+        );
         emit(workingState);
         return;
       }
@@ -116,7 +120,9 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
       if (code.contains('MC')) {
         emit(workingState.copyWith(isLoading: true));
         workingState = await _handleMaterial(workingState, code);
-        workingState = _applyPlaceholder(workingState.copyWith(isLoading: false));
+        workingState = _applyPlaceholder(
+          workingState.copyWith(isLoading: false),
+        );
         if (workingState.step == TransferStep.idle) {
           workingState = await _finalizeCollection(workingState, emit);
         } else {
@@ -132,7 +138,9 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
 
       throw Exception('采集内容不合法!');
     } catch (e) {
-      final error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : e.toString();
+      final error = e is Exception
+          ? e.toString().replaceFirst('Exception: ', '')
+          : e.toString();
       var resetState = state.copyWith(
         isLoading: false,
         errorMessage: error,
@@ -145,7 +153,7 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     }
   }
 
-  FutureOr<void> _onQuantitySubmitted(
+  void _onQuantitySubmitted(
     FloorTransferQuantitySubmitted event,
     Emitter<FloorTransferState> emit,
   ) async {
@@ -156,7 +164,10 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     }
 
     try {
-      var workingState = state.copyWith(errorMessage: null, successMessage: null);
+      var workingState = state.copyWith(
+        errorMessage: null,
+        successMessage: null,
+      );
       workingState = _handleQuantity(workingState, code);
       workingState = _applyPlaceholder(workingState);
       if (workingState.step == TransferStep.idle) {
@@ -165,12 +176,14 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
         emit(workingState);
       }
     } catch (e) {
-      final error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : e.toString();
+      final error = e is Exception
+          ? e.toString().replaceFirst('Exception: ', '')
+          : e.toString();
       emit(state.copyWith(errorMessage: error));
     }
   }
 
-  FutureOr<void> _onStockSelected(
+  void _onStockSelected(
     FloorTransferStockSelected event,
     Emitter<FloorTransferState> emit,
   ) {
@@ -188,14 +201,16 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     emit(nextState);
   }
 
-  FutureOr<void> _onSelectionChanged(
+  void _onSelectionChanged(
     FloorTransferSelectionChanged event,
     Emitter<FloorTransferState> emit,
   ) {
-    emit(state.copyWith(selectedRecordIds: List<String>.from(event.selectedIds)));
+    emit(
+      state.copyWith(selectedRecordIds: List<String>.from(event.selectedIds)),
+    );
   }
 
-  FutureOr<void> _onDeleteSelected(
+  void _onDeleteSelected(
     FloorTransferDeleteSelected event,
     Emitter<FloorTransferState> emit,
   ) {
@@ -207,11 +222,13 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
         .where((record) => !state.selectedRecordIds.contains(record.id))
         .toList();
     _rebuildAggregations(remaining);
-    emit(state.copyWith(
-      records: remaining,
-      selectedRecordIds: const [],
-      successMessage: '已删除选中的采集记录',
-    ));
+    emit(
+      state.copyWith(
+        records: remaining,
+        selectedRecordIds: const [],
+        successMessage: '已删除选中的采集记录',
+      ),
+    );
   }
 
   Future<void> _onSubmitRequested(
@@ -223,7 +240,13 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
       return;
     }
 
-    emit(state.copyWith(isSubmitting: true, errorMessage: null, successMessage: null));
+    emit(
+      state.copyWith(
+        isSubmitting: true,
+        errorMessage: null,
+        successMessage: null,
+      ),
+    );
     try {
       final payload = _buildSubmissionPayload(state.records);
       await _service.commitTransfer(payload);
@@ -238,18 +261,17 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
       final resetState = _resetCollectionFields(
         clearedState,
         clearRecords: true,
-      ).copyWith(
-        isSubmitting: false,
-        successMessage: '提交成功',
-      );
+      ).copyWith(isSubmitting: false, successMessage: '提交成功');
       emit(resetState);
     } catch (e) {
-      final error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : e.toString();
+      final error = e is Exception
+          ? e.toString().replaceFirst('Exception: ', '')
+          : e.toString();
       emit(state.copyWith(isSubmitting: false, errorMessage: error));
     }
   }
 
-  FutureOr<void> _onTabChanged(
+  void _onTabChanged(
     FloorTransferTabChanged event,
     Emitter<FloorTransferState> emit,
   ) {
@@ -262,25 +284,29 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
   ) async {
     final keyword = event.keyword.trim();
     if (keyword.isEmpty) {
-      emit(state.copyWith(
-        inventoryQueryKeyword: '',
-        inventoryQueryResults: const [],
-        inventoryQueryPage: 1,
-        inventoryQueryTotalPages: 1,
-        isInventoryQueryLoading: false,
-        inventoryQueryStep: event.step,
-      ));
+      emit(
+        state.copyWith(
+          inventoryQueryKeyword: '',
+          inventoryQueryResults: const [],
+          inventoryQueryPage: 1,
+          inventoryQueryTotalPages: 1,
+          isInventoryQueryLoading: false,
+          inventoryQueryStep: event.step,
+        ),
+      );
       return;
     }
 
-    emit(state.copyWith(
-      isInventoryQueryLoading: true,
-      inventoryQueryKeyword: keyword,
-      inventoryQueryStep: event.step,
-      inventoryQueryPage: event.page,
-      errorMessage: null,
-      successMessage: null,
-    ));
+    emit(
+      state.copyWith(
+        isInventoryQueryLoading: true,
+        inventoryQueryKeyword: keyword,
+        inventoryQueryStep: event.step,
+        inventoryQueryPage: event.page,
+        errorMessage: null,
+        successMessage: null,
+      ),
+    );
 
     try {
       final page = await _service.getRepertoryByBarcode(
@@ -289,18 +315,19 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
         pageIndex: event.page,
         pageSize: _inventoryPageSize,
       );
-      emit(state.copyWith(
-        isInventoryQueryLoading: false,
-        inventoryQueryResults: page.rows,
-        inventoryQueryPage: page.currentPage,
-        inventoryQueryTotalPages: page.totalPages,
-      ));
+      emit(
+        state.copyWith(
+          isInventoryQueryLoading: false,
+          inventoryQueryResults: page.rows,
+          inventoryQueryPage: page.currentPage,
+          inventoryQueryTotalPages: page.totalPages,
+        ),
+      );
     } catch (e) {
-      final error = e is Exception ? e.toString().replaceFirst('Exception: ', '') : e.toString();
-      emit(state.copyWith(
-        isInventoryQueryLoading: false,
-        errorMessage: error,
-      ));
+      final error = e is Exception
+          ? e.toString().replaceFirst('Exception: ', '')
+          : e.toString();
+      emit(state.copyWith(isInventoryQueryLoading: false, errorMessage: error));
     }
   }
 
@@ -312,21 +339,23 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     if (keyword.isEmpty) {
       return;
     }
-    add(FloorTransferInventorySearchRequested(
-      keyword: keyword,
-      step: state.inventoryQueryStep,
-      page: event.pageIndex,
-    ));
+    add(
+      FloorTransferInventorySearchRequested(
+        keyword: keyword,
+        step: state.inventoryQueryStep,
+        page: event.pageIndex,
+      ),
+    );
   }
 
-  FutureOr<void> _onMessageCleared(
+  void _onMessageCleared(
     FloorTransferMessageCleared event,
     Emitter<FloorTransferState> emit,
   ) {
     emit(state.copyWith(errorMessage: null, successMessage: null));
   }
 
-  FutureOr<void> _onResetRequested(
+  void _onResetRequested(
     FloorTransferResetRequested event,
     Emitter<FloorTransferState> emit,
   ) {
@@ -373,10 +402,7 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
       if (siteCode == state.sourceSite) {
         throw Exception('扫描的目标库位与来源库位一样，请确认');
       }
-      var next = state.copyWith(
-        storeRoom: storeRoom,
-        targetSite: siteCode,
-      );
+      var next = state.copyWith(storeRoom: storeRoom, targetSite: siteCode);
       if (next.sourceSite.isNotEmpty && next.materialCode.isNotEmpty) {
         next = await _loadSourceInventory(next);
       }
@@ -455,7 +481,9 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     return state.copyWith(quantity: qty);
   }
 
-  Future<FloorTransferState> _loadSourceInventory(FloorTransferState state) async {
+  Future<FloorTransferState> _loadSourceInventory(
+    FloorTransferState state,
+  ) async {
     if (state.sourceSite.isEmpty || state.materialCode.isEmpty) {
       return state;
     }
@@ -482,7 +510,8 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     if (state.materialCode.isEmpty) {
       throw Exception('物料不能为空');
     }
-    if (state.materialControl != MaterialControl.serial && state.quantity <= 0) {
+    if (state.materialControl != MaterialControl.serial &&
+        state.quantity <= 0) {
       throw Exception('采集数量必须大于0');
     }
     if (state.erpStoreRoom.isEmpty) {
@@ -498,13 +527,15 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     );
 
     final available = state.sourceStocks
-        .where((stock) => stock.matchesKey(
-              state.sourceSite,
-              state.materialCode,
-              state.batchNo,
-              state.erpStoreRoom,
-              state.projectNum,
-            ))
+        .where(
+          (stock) => stock.matchesKey(
+            state.sourceSite,
+            state.materialCode,
+            state.batchNo,
+            state.erpStoreRoom,
+            state.projectNum,
+          ),
+        )
         .fold<double>(0, (sum, stock) => sum + stock.availableQty);
     if (available <= 0) {
       throw Exception('来源货位没有库存，请检查采集信息');
@@ -575,7 +606,8 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
     } else if (state.materialCode.isEmpty) {
       step = TransferStep.material;
       placeholder = '请扫描物料条码';
-    } else if (state.materialControl != MaterialControl.serial && state.quantity <= 0) {
+    } else if (state.materialControl != MaterialControl.serial &&
+        state.quantity <= 0) {
       step = TransferStep.quantity;
       placeholder = '请输入数量';
       focus = true;
@@ -637,7 +669,8 @@ class FloorTransferBloc extends Bloc<FloorTransferEvent, FloorTransferState> {
         record.erpStoreRoom,
         record.projectNum,
       );
-      _collectedQtyByKey[key] = (_collectedQtyByKey[key] ?? 0) + record.quantity;
+      _collectedQtyByKey[key] =
+          (_collectedQtyByKey[key] ?? 0) + record.quantity;
       if (record.serialNo.isNotEmpty) {
         _collectedSerials.add('${record.materialCode}@${record.serialNo}');
       }

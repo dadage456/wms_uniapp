@@ -9,8 +9,8 @@ import 'package:wms_app/modules/asrs_inbound/services/asrs_inbound_service.dart'
 class AsrsInboundCollectBloc
     extends Bloc<AsrsInboundCollectEvent, AsrsInboundCollectState> {
   AsrsInboundCollectBloc({required AsrsInboundService service})
-      : _service = service,
-        super(const AsrsInboundCollectState()) {
+    : _service = service,
+      super(const AsrsInboundCollectState()) {
     on<AsrsInboundCollectInitialized>(_onInitialized);
     on<AsrsInboundCollectTrayChanged>(_onTrayChanged);
     on<AsrsInboundCollectBarcodeScanned>(_onBarcodeScanned);
@@ -36,7 +36,9 @@ class AsrsInboundCollectBloc
     );
 
     try {
-      final details = await _service.fetchTaskDetails(taskId: event.task.taskId);
+      final details = await _service.fetchTaskDetails(
+        taskId: event.task.taskId,
+      );
       emit(
         state.copyWith(
           status: AsrsInboundCollectStatus.ready,
@@ -70,7 +72,10 @@ class AsrsInboundCollectBloc
     emit(state.copyWith(status: AsrsInboundCollectStatus.loading));
     try {
       await _service.checkTray(trayNo);
-      await _service.checkTrayBinding(taskId: state.task!.taskId, trayNo: trayNo);
+      await _service.checkTrayBinding(
+        taskId: state.task!.taskId,
+        trayNo: trayNo,
+      );
       emit(
         state.copyWith(
           status: AsrsInboundCollectStatus.ready,
@@ -114,8 +119,8 @@ class AsrsInboundCollectBloc
           step: AsrsInboundCollectStep.quantity,
           quantity: detail.taskQty > 0
               ? (detail.taskQty - detail.collectedQty)
-                  .clamp(0, detail.taskQty)
-                  .toDouble()
+                    .clamp(0, detail.taskQty)
+                    .toDouble()
               : 0.0,
           errorMessage: null,
           successMessage: '物料识别成功',
@@ -131,7 +136,7 @@ class AsrsInboundCollectBloc
     }
   }
 
-  FutureOr<void> _onQuantityChanged(
+  void _onQuantityChanged(
     AsrsInboundCollectQuantityChanged event,
     Emitter<AsrsInboundCollectState> emit,
   ) {
@@ -179,7 +184,7 @@ class AsrsInboundCollectBloc
     );
   }
 
-  FutureOr<void> _onRecordRemoved(
+  void _onRecordRemoved(
     AsrsInboundCollectRecordRemoved event,
     Emitter<AsrsInboundCollectState> emit,
   ) {
@@ -234,7 +239,9 @@ class AsrsInboundCollectBloc
         filter: '',
       );
 
-      final refreshedDetails = await _service.fetchTaskDetails(taskId: task.taskId);
+      final refreshedDetails = await _service.fetchTaskDetails(
+        taskId: task.taskId,
+      );
 
       emit(
         state.copyWith(

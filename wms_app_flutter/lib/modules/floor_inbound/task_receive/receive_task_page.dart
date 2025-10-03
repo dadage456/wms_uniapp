@@ -46,10 +46,7 @@ class _InboundReceiveTaskPageState extends State<InboundReceiveTaskPage> {
       },
       onError: (error, __) {
         if (!mounted) return;
-        LoadingDialogManager.instance.showErrorDialog(
-          context,
-          '扫码异常：$error',
-        );
+        LoadingDialogManager.instance.showErrorDialog(context, '扫码异常：$error');
       },
     );
   }
@@ -66,33 +63,38 @@ class _InboundReceiveTaskPageState extends State<InboundReceiveTaskPage> {
       appBar: CustomAppBar(title: '待接收任务').appBar,
       body: BlocProvider.value(
         value: _gridBloc,
-        child: BlocConsumer<CommonDataGridBloc<InboundTask>, CommonDataGridState<InboundTask>>(
-          listener: (context, state) {
-            if (state.status == GridStatus.loading) {
-              LoadingDialogManager.instance.showLoadingDialog(context);
-            } else {
-              LoadingDialogManager.instance.hideLoadingDialog(context);
-            }
-            if (state.status == GridStatus.error) {
-              LoadingDialogManager.instance.showErrorDialog(
-                context,
-                state.errorMessage ?? '加载接收任务失败',
-              );
-            }
-          },
-          builder: (context, state) {
-            return CommonDataGrid<InboundTask>(
-              columns: InboundTaskGridConfig.buildColumns(
-                _onOperate,
-                includeCollect: false,
-              ),
-              data: state.data ?? const [],
-              currentPage: state.currentPage,
-              totalPages: state.totalPages,
-              onLoadData: (index) async => _gridBloc.add(LoadDataEvent(index)),
-            );
-          },
-        ),
+        child:
+            BlocConsumer<
+              CommonDataGridBloc<InboundTask>,
+              CommonDataGridState<InboundTask>
+            >(
+              listener: (context, state) {
+                if (state.status == GridStatus.loading) {
+                  LoadingDialogManager.instance.showLoadingDialog(context);
+                } else {
+                  LoadingDialogManager.instance.hideLoadingDialog(context);
+                }
+                if (state.status == GridStatus.error) {
+                  LoadingDialogManager.instance.showErrorDialog(
+                    context,
+                    state.errorMessage ?? '加载接收任务失败',
+                  );
+                }
+              },
+              builder: (context, state) {
+                return CommonDataGrid<InboundTask>(
+                  columns: InboundTaskGridConfig.buildColumns(
+                    _onOperate,
+                    includeCollect: false,
+                  ),
+                  datas: state.data,
+                  currentPage: state.currentPage,
+                  totalPages: state.totalPages,
+                  onLoadData: (index) async =>
+                      _gridBloc.add(LoadDataEvent(index)),
+                );
+              },
+            ),
       ),
     );
   }

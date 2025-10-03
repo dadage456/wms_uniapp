@@ -8,8 +8,8 @@ import 'package:wms_app/modules/pull_feeding/services/pull_feeding_service.dart'
 
 class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
   PullFeedingBloc({required PullFeedingService service})
-      : _service = service,
-        super(const PullFeedingState()) {
+    : _service = service,
+      super(const PullFeedingState()) {
     on<PullFeedingInitialized>(_onInitialized);
     on<PullFeedingScanReceived>(_onScanReceived);
     on<PullFeedingQuantitySubmitted>(_onQuantitySubmitted);
@@ -24,7 +24,7 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
   final Map<String, double> _collectedByMaterial = {};
   final Map<String, PullFeedingRecord> _recordsByKey = {};
 
-  FutureOr<void> _onInitialized(
+  void _onInitialized(
     PullFeedingInitialized event,
     Emitter<PullFeedingState> emit,
   ) {
@@ -58,23 +58,21 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
           throw Exception('库位条码不合法');
         }
         emit(
-          state
-              .clearMessages()
-              .copyWith(
-                storeSite: site,
-                step: PullFeedingStep.material,
-                placeholder: _placeholder(
-                  storeSite: site,
-                  barcodeContent: null,
-                  collectQty: 0,
-                ),
-                focusInput: false,
-                status: PullFeedingStatus.ready,
-                inventoryQty: 0,
-                collectQty: 0,
-                quantityRule: const PullFeedingQuantityRule(),
-                clearBarcode: true,
-              ),
+          state.clearMessages().copyWith(
+            storeSite: site,
+            step: PullFeedingStep.material,
+            placeholder: _placeholder(
+              storeSite: site,
+              barcodeContent: null,
+              collectQty: 0,
+            ),
+            focusInput: false,
+            status: PullFeedingStatus.ready,
+            inventoryQty: 0,
+            collectQty: 0,
+            quantityRule: const PullFeedingQuantityRule(),
+            clearBarcode: true,
+          ),
         );
         return;
       }
@@ -149,14 +147,14 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
     }
   }
 
-  FutureOr<void> _onSelectionChanged(
+  void _onSelectionChanged(
     PullFeedingSelectionChanged event,
     Emitter<PullFeedingState> emit,
   ) {
     emit(state.copyWith(selectedRecordIds: event.selectedIds.toSet()));
   }
 
-  FutureOr<void> _onDeleteSelected(
+  void _onDeleteSelected(
     PullFeedingDeleteSelected event,
     Emitter<PullFeedingState> emit,
   ) {
@@ -202,7 +200,9 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
       return;
     }
 
-    emit(state.copyWith(status: PullFeedingStatus.submitting, errorMessage: null));
+    emit(
+      state.copyWith(status: PullFeedingStatus.submitting, errorMessage: null),
+    );
     try {
       await _service.submit(state.records);
       _collectedByMaterial.clear();
@@ -223,7 +223,7 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
     }
   }
 
-  FutureOr<void> _onResetRequested(
+  void _onResetRequested(
     PullFeedingResetRequested event,
     Emitter<PullFeedingState> emit,
   ) {
@@ -232,7 +232,7 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
     emit(const PullFeedingState(status: PullFeedingStatus.ready));
   }
 
-  FutureOr<void> _onMessageCleared(
+  void _onMessageCleared(
     PullFeedingMessageCleared event,
     Emitter<PullFeedingState> emit,
   ) {
@@ -262,7 +262,9 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
 
     if (available - collected < quantity && available > 0) {
       if (collected > 0) {
-        throw Exception('已经扫描数【$collected】加上本次扫描数量【$quantity】大于库存数【$available】，请确认!');
+        throw Exception(
+          '已经扫描数【$collected】加上本次扫描数量【$quantity】大于库存数【$available】，请确认!',
+        );
       }
       throw Exception('库存数【$available】小于本次作业数量【$quantity】，请确认!');
     }
@@ -271,7 +273,9 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
     final existing = _recordsByKey[key];
     PullFeedingRecord record;
     if (existing != null) {
-      final index = updatedRecords.indexWhere((element) => element.id == existing.id);
+      final index = updatedRecords.indexWhere(
+        (element) => element.id == existing.id,
+      );
       final nextQty = existing.quantity + quantity;
       record = existing.copyWith(quantity: nextQty);
       if (index >= 0) {
@@ -309,7 +313,8 @@ class PullFeedingBloc extends Bloc<PullFeedingEvent, PullFeedingState> {
     );
   }
 
-  static String _buildKey(String storeSite, String materialCode) => '$storeSite|$materialCode';
+  static String _buildKey(String storeSite, String materialCode) =>
+      '$storeSite|$materialCode';
 
   static bool _isNumeric(String value) {
     return double.tryParse(value) != null;

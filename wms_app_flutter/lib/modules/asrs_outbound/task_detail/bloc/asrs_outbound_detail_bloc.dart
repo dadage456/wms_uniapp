@@ -9,8 +9,8 @@ import 'package:wms_app/modules/asrs_outbound/task_detail/bloc/asrs_outbound_det
 class AsrsOutboundDetailBloc
     extends Bloc<AsrsOutboundDetailEvent, AsrsOutboundDetailState> {
   AsrsOutboundDetailBloc({required AsrsOutboundService service})
-      : _service = service,
-        super(const AsrsOutboundDetailState()) {
+    : _service = service,
+      super(const AsrsOutboundDetailState()) {
     on<AsrsOutboundDetailStarted>(_onStarted);
     on<AsrsOutboundDetailSearchChanged>(_onSearchChanged);
     on<AsrsOutboundDetailSelectionToggled>(_onSelectionToggled);
@@ -37,7 +37,7 @@ class AsrsOutboundDetailBloc
     await _loadDetails(emit, task: state.task!, keyword: event.keyword);
   }
 
-  FutureOr<void> _onSelectionToggled(
+  void _onSelectionToggled(
     AsrsOutboundDetailSelectionToggled event,
     Emitter<AsrsOutboundDetailState> emit,
   ) {
@@ -50,7 +50,7 @@ class AsrsOutboundDetailBloc
     emit(state.copyWith(selectedIds: updated));
   }
 
-  FutureOr<void> _onToggleAll(
+  void _onToggleAll(
     AsrsOutboundDetailToggleAll event,
     Emitter<AsrsOutboundDetailState> emit,
   ) {
@@ -97,10 +97,7 @@ class AsrsOutboundDetailBloc
       );
     } catch (e) {
       emit(
-        state.copyWith(
-          isActionInProgress: false,
-          errorMessage: e.toString(),
-        ),
+        state.copyWith(isActionInProgress: false, errorMessage: e.toString()),
       );
     }
   }

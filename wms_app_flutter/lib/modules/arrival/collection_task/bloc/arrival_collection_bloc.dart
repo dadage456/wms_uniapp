@@ -13,8 +13,8 @@ import 'package:wms_app/modules/floor_inbound/collection_task/models/inbound_col
 class ArrivalCollectionBloc
     extends Bloc<ArrivalCollectionEvent, ArrivalCollectionState> {
   ArrivalCollectionBloc({required ArrivalService service})
-      : _service = service,
-        super(const ArrivalCollectionState()) {
+    : _service = service,
+      super(const ArrivalCollectionState()) {
     on<InitializeArrivalCollection>(_onInitialize);
     on<ArrivalCollectionScanReceived>(_onScanReceived);
     on<ArrivalCollectionDetailSelected>(_onDetailSelected);
@@ -47,7 +47,9 @@ class ArrivalCollectionBloc
     );
 
     try {
-      _currentQuery = ArrivalTaskDetailQuery(arrivalsBillId: event.task.arrivalsBillId);
+      _currentQuery = ArrivalTaskDetailQuery(
+        arrivalsBillId: event.task.arrivalsBillId,
+      );
       final result = await _service.getArrivalDetails(_currentQuery!);
       final initialCollected = <String, double>{
         for (final item in result.rows) item.detailId: item.collectedQty,
@@ -91,20 +93,14 @@ class ArrivalCollectionBloc
       final detail = _findDetailForMaterial(material, state.details);
       if (detail == null) {
         emit(
-          state.copyWith(
-            errorMessage: '物料【${material.matCode}】不在当前任务中或已采集完成',
-          ),
+          state.copyWith(errorMessage: '物料【${material.matCode}】不在当前任务中或已采集完成'),
         );
         return;
       }
 
       final remaining = _remainingQty(detail);
       if (remaining <= 0) {
-        emit(
-          state.copyWith(
-            errorMessage: '物料【${detail.materialCode}】已完成采集',
-          ),
-        );
+        emit(state.copyWith(errorMessage: '物料【${detail.materialCode}】已完成采集'));
         return;
       }
 
@@ -137,9 +133,7 @@ class ArrivalCollectionBloc
     final remaining = _remainingQty(event.detail);
     if (remaining <= 0) {
       emit(
-        state.copyWith(
-          errorMessage: '物料【${event.detail.materialCode}】已完成采集',
-        ),
+        state.copyWith(errorMessage: '物料【${event.detail.materialCode}】已完成采集'),
       );
       return;
     }
@@ -191,19 +185,15 @@ class ArrivalCollectionBloc
 
     final quantity = event.quantity;
     if (quantity <= 0) {
-      emit(
-        state.copyWith(
-          errorMessage: '采集数量必须大于0',
-          clearSuccess: true,
-        ),
-      );
+      emit(state.copyWith(errorMessage: '采集数量必须大于0', clearSuccess: true));
       return;
     }
 
     if (quantity > prompt.remainingQty + 1e-6) {
       emit(
         state.copyWith(
-          errorMessage: '采集数量不能超过剩余任务数量${prompt.remainingQty.toStringAsFixed(2)}',
+          errorMessage:
+              '采集数量不能超过剩余任务数量${prompt.remainingQty.toStringAsFixed(2)}',
           clearSuccess: true,
         ),
       );
@@ -217,12 +207,10 @@ class ArrivalCollectionBloc
         : (detail.batchNo.isNotEmpty ? detail.batchNo : null);
     final serial = (material?.sn?.isNotEmpty ?? false) ? material!.sn : null;
 
-    final matchesBatch = detail.batchNo.isEmpty ||
-        batch == null ||
-        detail.batchNo == batch;
-    final matchesSerial = detail.serialNo.isEmpty ||
-        serial == null ||
-        detail.serialNo == serial;
+    final matchesBatch =
+        detail.batchNo.isEmpty || batch == null || detail.batchNo == batch;
+    final matchesSerial =
+        detail.serialNo.isEmpty || serial == null || detail.serialNo == serial;
     final collectFlag = (matchesBatch && matchesSerial) ? '0' : '1';
 
     final record = ArrivalCollectionRecord(
@@ -246,12 +234,14 @@ class ArrivalCollectionBloc
     );
 
     final updatedRecords = List<ArrivalCollectionRecord>.from(state.records);
-    final index =
-        updatedRecords.indexWhere((element) => element.isSameTarget(record));
+    final index = updatedRecords.indexWhere(
+      (element) => element.isSameTarget(record),
+    );
     if (index >= 0) {
       final existing = updatedRecords[index];
-      updatedRecords[index] =
-          existing.copyWith(quantity: existing.quantity + record.quantity);
+      updatedRecords[index] = existing.copyWith(
+        quantity: existing.quantity + record.quantity,
+      );
     } else {
       updatedRecords.add(record);
     }
@@ -280,8 +270,9 @@ class ArrivalCollectionBloc
     ArrivalCollectionRecordRemoved event,
     Emitter<ArrivalCollectionState> emit,
   ) {
-    final targetIndex =
-        state.records.indexWhere((element) => element.id == event.recordId);
+    final targetIndex = state.records.indexWhere(
+      (element) => element.id == event.recordId,
+    );
     if (targetIndex < 0) {
       return;
     }
@@ -292,7 +283,10 @@ class ArrivalCollectionBloc
 
     final updatedDetails = state.details.map((item) {
       if (item.detailId == target.detailId) {
-        final newQty = (item.collectedQty - target.quantity).clamp(0, item.planQty);
+        final double newQty = (item.collectedQty - target.quantity).clamp(
+          0,
+          item.planQty,
+        );
         return item.copyWith(collectedQty: newQty);
       }
       return item;
@@ -318,20 +312,13 @@ class ArrivalCollectionBloc
     }
     if (state.records.isEmpty) {
       emit(
-        state.copyWith(
-          errorMessage: '本次无采集记录，请先采集后再提交',
-          clearSuccess: true,
-        ),
+        state.copyWith(errorMessage: '本次无采集记录，请先采集后再提交', clearSuccess: true),
       );
       return;
     }
 
     emit(
-      state.copyWith(
-        isSubmitting: true,
-        clearError: true,
-        clearSuccess: true,
-      ),
+      state.copyWith(isSubmitting: true, clearError: true, clearSuccess: true),
     );
 
     try {
@@ -406,8 +393,13 @@ class ArrivalCollectionBloc
     }).toList();
 
     if (candidates.isEmpty) {
-      final fallback = details.where((item) =>
-          item.materialCode == material.matCode && _remainingQty(item) > 0).toList();
+      final fallback = details
+          .where(
+            (item) =>
+                item.materialCode == material.matCode &&
+                _remainingQty(item) > 0,
+          )
+          .toList();
       if (fallback.isEmpty) {
         return null;
       }
@@ -415,9 +407,7 @@ class ArrivalCollectionBloc
       return fallback.first;
     }
 
-    candidates.sort(
-      (a, b) => _remainingQty(b).compareTo(_remainingQty(a)),
-    );
+    candidates.sort((a, b) => _remainingQty(b).compareTo(_remainingQty(a)));
     return candidates.first;
   }
 

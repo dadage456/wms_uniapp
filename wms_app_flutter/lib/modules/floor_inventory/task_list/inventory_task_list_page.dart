@@ -32,7 +32,7 @@ class _InventoryTaskListPageState extends State<InventoryTaskListPage> {
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<InventoryTaskListBloc>();
+    _bloc = BlocProvider.of<InventoryTaskListBloc>(context);
     _gridBloc = _bloc.gridBloc;
 
     _scanSubscription = ScannerService.instance.stream.listen((code) {
@@ -73,15 +73,15 @@ class _InventoryTaskListPageState extends State<InventoryTaskListPage> {
       body: BlocListener<InventoryTaskListBloc, InventoryTaskListState>(
         listener: (context, state) {
           if (state.successMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.successMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
             _bloc.add(const InventoryTaskMessageCleared());
           }
           if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
             _bloc.add(const InventoryTaskMessageCleared());
           }
         },
@@ -123,8 +123,9 @@ class _InventoryTaskListPageState extends State<InventoryTaskListPage> {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: () =>
-                _bloc.add(InventoryTaskListSearchSubmitted(_searchController.text.trim())),
+            onPressed: () => _bloc.add(
+              InventoryTaskListSearchSubmitted(_searchController.text.trim()),
+            ),
             child: const Text('查询'),
           ),
         ],
@@ -135,35 +136,39 @@ class _InventoryTaskListPageState extends State<InventoryTaskListPage> {
   Widget _buildGrid() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<InventoryTask>,
-          CommonDataGridState<InventoryTask>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<InventoryTask>,
+            CommonDataGridState<InventoryTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error && state.errorMessage != null) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage!,
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<InventoryTask>(
-            columns: InventoryTaskGridConfig.buildColumns(_onOperate),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<InventoryTask>(pageIndex));
+              if (state.status == GridStatus.error &&
+                  state.errorMessage != null) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage!,
+                );
+              }
             },
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<InventoryTask>(
+                columns: InventoryTaskGridConfig.buildColumns(_onOperate),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<InventoryTask>(pageIndex));
+                },
+              );
+            },
+          ),
     );
   }
 
@@ -184,6 +189,8 @@ class _InventoryTaskListPageState extends State<InventoryTaskListPage> {
       case InventoryTaskOperationType.cancel:
         _confirmCancel(task);
         break;
+      case InventoryTaskOperationType.receive:
+        break;
     }
   }
 
@@ -193,7 +200,9 @@ class _InventoryTaskListPageState extends State<InventoryTaskListPage> {
       builder: (context) {
         return AlertDialog(
           title: const Text('撤销确认'),
-          content: Text('确定撤销盘库任务 ${task.taskNo.isNotEmpty ? task.taskNo : task.taskComment} 吗？'),
+          content: Text(
+            '确定撤销盘库任务 ${task.taskNo.isNotEmpty ? task.taskNo : task.taskComment} 吗？',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),

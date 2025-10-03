@@ -12,34 +12,34 @@ class MessageListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = BlocProvider.of<MessageListBloc>(context);
+
     return Scaffold(
-      appBar: CustomAppBar(
-        title: '通知列表',
-        onBackPressed: Modular.to.pop,
-      ).appBar,
+      appBar: CustomAppBar(title: '通知列表', onBackPressed: Modular.to.pop).appBar,
       body: BlocConsumer<MessageListBloc, MessageListState>(
         listener: (context, state) {
-          if (state.status == MessageListStatus.failure && state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage!)),
-            );
+          if (state.status == MessageListStatus.failure &&
+              state.errorMessage != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
           }
         },
         builder: (context, state) {
           final isInitialLoading =
-              state.status == MessageListStatus.loading && state.notices.isEmpty;
+              state.status == MessageListStatus.loading &&
+              state.notices.isEmpty;
           if (isInitialLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
           final isFailureWithoutData =
-              state.status == MessageListStatus.failure && state.notices.isEmpty;
+              state.status == MessageListStatus.failure &&
+              state.notices.isEmpty;
           if (isFailureWithoutData) {
             return _ErrorView(
               message: state.errorMessage ?? '公告获取失败',
-              onRetry: () => context
-                  .read<MessageListBloc>()
-                  .add(const MessageListSubscriptionRequested()),
+              onRetry: () => bloc.add(const MessageListSubscriptionRequested()),
             );
           }
 
@@ -47,8 +47,10 @@ class MessageListPage extends StatelessWidget {
               ? const _EmptyView()
               : ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   itemBuilder: (context, index) =>
                       _NoticeTile(notice: state.notices[index]),
                   separatorBuilder: (_, __) => const Divider(height: 1),
@@ -57,7 +59,6 @@ class MessageListPage extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              final bloc = context.read<MessageListBloc>();
               bloc.add(const MessageListRefreshRequested());
               await bloc.stream.firstWhere(
                 (next) => next.status != MessageListStatus.loading,
@@ -115,10 +116,7 @@ class _ErrorView extends StatelessWidget {
               style: const TextStyle(color: Colors.black54, fontSize: 16),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: onRetry,
-              child: const Text('重新加载'),
-            ),
+            ElevatedButton(onPressed: onRetry, child: const Text('重新加载')),
           ],
         ),
       ),
@@ -133,6 +131,8 @@ class _NoticeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = BlocProvider.of<MessageListBloc>(context);
+
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       title: Text(
@@ -142,7 +142,9 @@ class _NoticeTile extends StatelessWidget {
         style: TextStyle(
           fontSize: 16,
           fontWeight: notice.isRead ? FontWeight.w400 : FontWeight.w600,
-          color: notice.isRead ? const Color(0xFF6B7280) : const Color(0xFF111827),
+          color: notice.isRead
+              ? const Color(0xFF6B7280)
+              : const Color(0xFF111827),
         ),
       ),
       subtitle: Row(
@@ -168,9 +170,7 @@ class _NoticeTile extends StatelessWidget {
           : const Icon(Icons.markunread, color: Color(0xFF2563EB)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
-        context
-            .read<MessageListBloc>()
-            .add(MessageListMarkAsReadRequested(notice.noticeId));
+        bloc.add(MessageListMarkAsReadRequested(notice.noticeId));
         Modular.to.pushNamed(
           '/message-center/detail',
           arguments: {'noticeId': notice.noticeId, 'title': notice.noticeTitle},

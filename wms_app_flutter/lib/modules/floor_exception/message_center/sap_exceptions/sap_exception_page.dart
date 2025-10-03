@@ -52,7 +52,7 @@ class _SapExceptionViewState extends State<_SapExceptionView> {
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<SapExceptionBloc>();
+    _bloc = BlocProvider.of<SapExceptionBloc>(context);
     _gridBloc = _bloc.gridBloc;
 
     _scanSubscription = ScannerService.instance.stream.listen((code) {
@@ -81,9 +81,9 @@ class _SapExceptionViewState extends State<_SapExceptionView> {
         BlocListener<SapExceptionBloc, SapExceptionState>(
           listener: (context, state) {
             if (state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage!)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
               _bloc.add(const SapExceptionClearError());
             }
           },
@@ -129,8 +129,7 @@ class _SapExceptionViewState extends State<_SapExceptionView> {
           const SizedBox(width: 12),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                _bloc.add(const SapExceptionRefreshRequested()),
+            onPressed: () => _bloc.add(const SapExceptionRefreshRequested()),
           ),
         ],
       ),
@@ -140,35 +139,39 @@ class _SapExceptionViewState extends State<_SapExceptionView> {
   Widget _buildGrid() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<SapExceptionRecord>,
-          CommonDataGridState<SapExceptionRecord>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<SapExceptionRecord>,
+            CommonDataGridState<SapExceptionRecord>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error && state.errorMessage != null) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage!,
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<SapExceptionRecord>(
-            columns: SapExceptionGridConfig.buildColumns(),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<SapExceptionRecord>(pageIndex));
+              if (state.status == GridStatus.error &&
+                  state.errorMessage != null) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage!,
+                );
+              }
             },
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<SapExceptionRecord>(
+                columns: SapExceptionGridConfig.buildColumns(),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<SapExceptionRecord>(pageIndex));
+                },
+              );
+            },
+          ),
     );
   }
 }

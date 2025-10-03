@@ -5,6 +5,7 @@ import 'package:wms_app/app_module.dart';
 import 'package:wms_app/modules/message_center/detail/bloc/notice_detail_cubit.dart';
 import 'package:wms_app/modules/message_center/detail/notice_detail_page.dart';
 import 'package:wms_app/modules/message_center/list/bloc/message_list_bloc.dart';
+import 'package:wms_app/modules/message_center/list/bloc/message_list_event.dart';
 import 'package:wms_app/modules/message_center/list/message_list_page.dart';
 import 'package:wms_app/modules/message_center/services/message_center_service.dart';
 import 'package:wms_app/services/dio_client.dart';
@@ -33,8 +34,9 @@ class MessageCenterModule extends Module {
     r.child(
       '/',
       child: (context) => BlocProvider(
-        create: (context) => Modular.get<MessageListBloc>()
-          ..add(const MessageListSubscriptionRequested()),
+        create: (context) =>
+            Modular.get<MessageListBloc>()
+              ..add(const MessageListSubscriptionRequested()),
         child: const MessageListPage(),
       ),
     );

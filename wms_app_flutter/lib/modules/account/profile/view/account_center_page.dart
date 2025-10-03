@@ -11,6 +11,8 @@ class AccountCenterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = BlocProvider.of<AccountProfileCubit>(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text('个人中心')),
       body: BlocConsumer<AccountProfileCubit, AccountProfileState>(
@@ -31,16 +33,17 @@ class AccountCenterPage extends StatelessWidget {
           }
 
           if (!state.ready) {
-            return _EmptyState(onRetry: () {
-              context.read<AccountProfileCubit>().loadProfile();
-            });
+            return _EmptyState(
+              onRetry: () {
+                bloc.loadProfile();
+              },
+            );
           }
 
           final profile = state.profile!;
 
           return RefreshIndicator(
-            onRefresh: () =>
-                context.read<AccountProfileCubit>().loadProfile(refresh: true),
+            onRefresh: () => bloc.loadProfile(refresh: true),
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -87,10 +90,9 @@ class _ProfileHeader extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               child: Text(
                 initial.toUpperCase(),
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: Theme.of(context).colorScheme.primary),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             const SizedBox(width: 20),
@@ -100,10 +102,9 @@ class _ProfileHeader extends StatelessWidget {
                 children: [
                   Text(
                     displayName,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text('账号：${profile.user.userName}'),
@@ -127,7 +128,11 @@ class _InfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = [
-      _InfoRow(icon: Icons.badge_outlined, label: '角色', value: profile.roleGroup),
+      _InfoRow(
+        icon: Icons.badge_outlined,
+        label: '角色',
+        value: profile.roleGroup,
+      ),
       _InfoRow(icon: Icons.work_outline, label: '岗位', value: profile.postGroup),
       _InfoRow(
         icon: Icons.phone_iphone,
@@ -196,6 +201,7 @@ class _ActionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = BlocProvider.of<AccountProfileCubit>(context);
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -211,9 +217,7 @@ class _ActionList extends StatelessWidget {
                 arguments: profile,
               );
               if (success == true && context.mounted) {
-                await context
-                    .read<AccountProfileCubit>()
-                    .loadProfile(refresh: true);
+                await bloc.loadProfile(refresh: true);
               }
             },
           ),

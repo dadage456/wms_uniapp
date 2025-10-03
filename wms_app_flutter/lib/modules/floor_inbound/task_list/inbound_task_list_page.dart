@@ -45,10 +45,7 @@ class _InboundTaskListPageState extends State<InboundTaskListPage> {
       },
       onError: (error, __) {
         if (!mounted) return;
-        LoadingDialogManager.instance.showErrorDialog(
-          context,
-          '扫码异常：$error',
-        );
+        LoadingDialogManager.instance.showErrorDialog(context, '扫码异常：$error');
       },
     );
   }
@@ -113,7 +110,8 @@ class _InboundTaskListPageState extends State<InboundTaskListPage> {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: () => _bloc.add(SearchInboundTasksEvent(_scanController.text.trim())),
+            onPressed: () =>
+                _bloc.add(SearchInboundTasksEvent(_scanController.text.trim())),
             child: const Text('查询'),
           ),
         ],
@@ -124,34 +122,38 @@ class _InboundTaskListPageState extends State<InboundTaskListPage> {
   Widget _buildGrid() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<InboundTask>, CommonDataGridState<InboundTask>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<InboundTask>,
+            CommonDataGridState<InboundTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载任务列表失败',
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<InboundTask>(
-            columns: InboundTaskGridConfig.buildColumns(_onOperate),
-            data: state.data ?? const [],
-            selectedRows: state.selectedRows,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent(pageIndex));
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载任务列表失败',
+                );
+              }
             },
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<InboundTask>(
+                columns: InboundTaskGridConfig.buildColumns(_onOperate),
+                datas: state.data,
+                selectedRows: state.selectedRows,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent(pageIndex));
+                },
+              );
+            },
+          ),
     );
   }
 
@@ -164,10 +166,7 @@ class _InboundTaskListPageState extends State<InboundTaskListPage> {
     } else {
       Modular.to.pushNamed(
         '/floor-inbound/detail/${task.inTaskId}',
-        arguments: {
-          'task': task,
-          'workStation': task.workStation,
-        },
+        arguments: {'task': task, 'workStation': task.workStation},
       );
     }
   }
