@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:wms_app/services/user_manager.dart';
 
 /* ---------------- 入口 ---------------- */
 class WMSHomePage extends StatelessWidget {
@@ -23,14 +24,14 @@ class _MainContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
+    return SafeArea(
       child: Column(
         children: [
-          _Header(),
-          SizedBox(height: 10),
-          _NotificationSection(),
-          SizedBox(height: 18),
-          _FunctionGrid(),
+          const _Header(),
+          const SizedBox(height: 10),
+          NotificationSection(),
+          const SizedBox(height: 18),
+          const _FunctionGrid(),
         ],
       ),
     );
@@ -80,8 +81,8 @@ class _Header extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.logout, color: Colors.white, size: 24),
+            onPressed: () => Modular.to.pushNamed('/account'),
+            icon: const Icon(Icons.settings, color: Colors.white, size: 24),
           ),
         ),
         const SizedBox(height: 28),
@@ -123,12 +124,14 @@ class _Header extends StatelessWidget {
 }
 
 /* ---------------- 通知区 ---------------- */
-class _NotificationSection extends StatelessWidget {
-  const _NotificationSection();
+class NotificationSection extends StatelessWidget {
+  NotificationSection({super.key});
+
+  final UserManager _userManager = Modular.get<UserManager>();
 
   static const List<NotificationItem> _items = [
-    NotificationItem('采集异常', Icons.warning, Color(0xFFFF7637)),
-    NotificationItem('接口异常', Icons.link_off, Color(0xFFFF7637)),
+    NotificationItem('采集异常', Icons.warning, Color(0xFFFF7637), badgeCount: 0),
+    NotificationItem('接口异常', Icons.link_off, Color(0xFFFF7637), badgeCount: 0),
     NotificationItem('我的消息', Icons.message, Color(0xFF0099F9)),
   ];
 
@@ -159,12 +162,21 @@ class _NotificationSection extends StatelessWidget {
     child: Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('点击了 ${e.title}'),
-            duration: const Duration(seconds: 2),
-          ),
-        ),
+        onTap: () {
+          if (e.title == '采集异常') {
+            Modular.to.pushNamed(
+              '/floor-exception',
+              arguments: {'initialTab': 0},
+            );
+          } else if (e.title == '接口异常') {
+            Modular.to.pushNamed(
+              '/floor-exception',
+              arguments: {'initialTab': 2},
+            );
+          } else if (e.title == '我的消息') {
+            Modular.to.pushNamed('/message-center');
+          }
+        },
         borderRadius: BorderRadius.circular(8),
         splashColor: e.color.withValues(alpha: 0.3),
         highlightColor: e.color.withValues(alpha: 0.2),
@@ -183,43 +195,62 @@ class _NotificationSection extends StatelessWidget {
     ),
   );
 
-  Widget _iconWithBadge(NotificationItem e) => Stack(
-    clipBehavior: Clip.none,
-    children: [
-      Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: e.color,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(e.icon, color: Colors.white, size: 28),
+  Widget _iconWithBadge(NotificationItem e) {
+    final baseIcon = Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: e.color,
+        borderRadius: BorderRadius.circular(12),
       ),
-      Positioned(
-        top: -8,
-        right: -8,
-        child: Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFF5304),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-          ),
-          child: const Center(
-            child: Text(
-              '99',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
+      child: Icon(e.icon, color: Colors.white, size: 28),
+    );
+
+    if (e.title == '我的消息') {
+      return ValueListenableBuilder<int>(
+        valueListenable: _userManager.unreadNoticeCountListenable,
+        builder: (context, unread, _) => _badgeWrapper(baseIcon, unread),
+      );
+    }
+
+    return _badgeWrapper(baseIcon, e.badgeCount);
+  }
+
+  Widget _badgeWrapper(Widget icon, int? badgeCount) {
+    if (badgeCount == null || badgeCount <= 0) {
+      return icon;
+    }
+    final display = badgeCount > 99 ? '99+' : badgeCount.toString();
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        icon,
+        Positioned(
+          top: -8,
+          right: -8,
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF5304),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+            ),
+            child: Center(
+              child: Text(
+                display,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }
 
 /* ---------------- 功能网格 ---------------- */
@@ -238,7 +269,10 @@ class _FunctionGrid extends StatelessWidget {
     FunctionItem('平库下架接收', 'assets/images/home_icon_ outbound.svg'),
     FunctionItem('在线拣选', 'assets/images/home_icon_online_picking.svg'),
     FunctionItem('拉式发料', 'assets/images/home_icon_pull_feeding.svg'),
+    FunctionItem('立库入库', 'assets/images/home_icon_ inbound.svg'),
+    FunctionItem('立库出库', 'assets/images/home_icon_ outbound.svg'),
     FunctionItem('平库盘点', 'assets/images/home_icon_floor_count.svg'),
+    FunctionItem('异常处理', 'assets/images/home_icon_search.svg'),
     FunctionItem('平库移库', 'assets/images/home_icon_floor_to_floor.svg'),
     FunctionItem('立库盘点', 'assets/images/home_icon_count.svg'),
     FunctionItem('库存查询', 'assets/images/home_icon_search.svg'),
@@ -295,21 +329,30 @@ class _FunctionGrid extends StatelessWidget {
           } else if (f.title == '到货接收') {
             Modular.to.pushNamed('/arrival');
           } else if (f.title == '立库组盘') {
-            Modular.to.pushNamed('/palletizing');
+            Modular.to.pushNamed('/asrs-inbound');
           } else if (f.title == '平库入库') {
             Modular.to.pushNamed('/floor-inbound');
           } else if (f.title == '在线拣选') {
-            Modular.to.pushNamed('/online-picking');
+            Modular.to.pushNamed('/asrs-outbound');
           } else if (f.title == '拉式发料') {
             Modular.to.pushNamed('/pull-feeding');
+          } else if (f.title == '立库入库') {
+            Modular.to.pushNamed('/asrs-inbound');
+          } else if (f.title == '立库出库') {
+            Modular.to.pushNamed('/asrs-outbound');
           } else if (f.title == '平库盘点') {
             Modular.to.pushNamed('/floor-count');
+          } else if (f.title == '异常处理') {
+            Modular.to.pushNamed('/floor-exception');
           } else if (f.title == '平库移库') {
             Modular.to.pushNamed('/floor-transfer');
           } else if (f.title == '立库盘点') {
             Modular.to.pushNamed('/warehouse-count');
           } else if (f.title == '库存查询') {
-            Modular.to.pushNamed('/inventory-query');
+            Modular.to.pushNamed(
+              '/inventory-query',
+              arguments: {'initialTab': 1},
+            );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -374,7 +417,8 @@ class NotificationItem {
   final String title;
   final IconData icon;
   final Color color;
-  const NotificationItem(this.title, this.icon, this.color);
+  final int? badgeCount;
+  const NotificationItem(this.title, this.icon, this.color, {this.badgeCount});
 }
 
 class FunctionItem {

@@ -7,9 +7,17 @@ import 'package:wms_app/modules/home/home_page.dart';
 import 'package:wms_app/modules/home/login/login_page.dart';
 import 'package:wms_app/services/api_service.dart';
 import 'modules/outbound/outbound_module.dart';
-import 'modules/feature_placeholder/feature_placeholder_bloc.dart';
-import 'modules/feature_placeholder/feature_placeholder_module.dart';
+import 'modules/arrival/arrival_module.dart';
+import 'modules/asrs_inbound/asrs_inbound_module.dart';
+import 'modules/asrs_outbound/asrs_outbound_module.dart';
+import 'modules/asrs_inventory/asrs_inventory_module.dart';
+import 'modules/account/account_module.dart';
+import 'modules/floor_exception/floor_exception_module.dart';
 import 'modules/floor_inbound/floor_inbound_module.dart';
+import 'modules/floor_inventory/floor_inventory_module.dart';
+import 'modules/floor_transfer/floor_transfer_module.dart';
+import 'modules/message_center/message_center_module.dart';
+import 'modules/pull_feeding/pull_feeding_module.dart';
 
 /// 应用主模块
 class AppModule extends Module {
@@ -44,96 +52,28 @@ class AppModule extends Module {
     // 出库模块
     r.module('/outbound', module: OutboundModule());
 
-    // 其他模块占位路由
-    r.module(
-      '/arrival',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '到货接收',
-          description: '到货接收功能正在按平库出库模块标准进行Flutter重构。',
-          todoItems: [
-            '梳理到货接收业务流程',
-            '实现BLoC状态管理与列表查询',
-            '对接api.md中到货接收相关接口',
-          ],
-        ),
-      ),
-    );
-
-    r.module(
-      '/palletizing',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '立库组盘',
-          description: '立库组盘模块重构预研中，稍后将基于统一组件实现。',
-          todoItems: [
-            '迁移现有UniApp页面逻辑',
-            '抽象公共表格与扫码交互组件',
-          ],
-        ),
-      ),
-    );
+    // 其他业务模块
+    r.module('/arrival', module: ArrivalModule());
 
     r.module('/floor-inbound', module: FloorInboundModule());
 
-    r.module(
-      '/online-picking',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '在线拣选',
-          description: '在线拣选将采用统一的任务列表 + 明细 + 采集模式。',
-        ),
-      ),
-    );
+    r.module('/floor-exception', module: FloorExceptionModule());
 
-    r.module(
-      '/pull-feeding',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '拉式发料',
-          description: '拉式发料模块重构排期中。',
-        ),
-      ),
-    );
+    r.module('/pull-feeding', module: PullFeedingModule());
 
-    r.module(
-      '/floor-count',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '平库盘点',
-          description: '平库盘点功能即将迁移，后续将支持离线缓存与差异分析。',
-        ),
-      ),
-    );
+    r.module('/asrs-inbound', module: AsrsInboundModule());
+    r.module('/asrs-outbound', module: AsrsOutboundModule());
 
-    r.module(
-      '/floor-transfer',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '平库移库',
-          description: '平库移库流程将沿用BLoC + 通用表格方案。',
-        ),
-      ),
-    );
+    r.module('/message-center', module: MessageCenterModule());
 
-    r.module(
-      '/warehouse-count',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '立库盘点',
-          description: '立库盘点迁移预定在下一阶段实施。',
-        ),
-      ),
-    );
+    r.module('/floor-count', module: FloorInventoryModule());
 
-    r.module(
-      '/inventory-query',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '库存查询',
-          description: '库存查询模块将统一搜索、筛选与导出能力。',
-        ),
-      ),
-    );
+    r.module('/floor-transfer', module: FloorTransferModule());
+
+    r.module('/warehouse-count', module: AsrsInventoryModule());
+
+    r.module('/inventory-query', module: FloorTransferModule());
+
+    r.module('/account', module: AccountModule());
   }
 }
