@@ -49,8 +49,8 @@ class ApiService {
   }
 
   /// 退出登录
-  Future<void> logout() async {
+  Future<void> logout({bool clearSavedLogin = false}) async {
     _dioClient.clearToken();
-    _userManager.logout();
+    await _userManager.logout(clearSavedLogin: clearSavedLogin);
   }
 }
