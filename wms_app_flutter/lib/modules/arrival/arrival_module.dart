@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:wms_app/app_module.dart';
 import 'package:wms_app/modules/arrival/collection_task/arrival_collection_page.dart';
+import 'package:wms_app/modules/arrival/collection_task/bloc/arrival_collection_bloc.dart';
 import 'package:wms_app/modules/arrival/services/arrival_service.dart';
 import 'package:wms_app/modules/arrival/task_details/arrival_task_detail_page.dart';
 import 'package:wms_app/modules/arrival/task_list/arrival_task_list_page.dart';
@@ -27,6 +28,10 @@ class ArrivalModule extends Module {
 
     i.add<ArrivalTaskReceiveBloc>(
       () => ArrivalTaskReceiveBloc(service: i.get<ArrivalService>()),
+    );
+
+    i.add<ArrivalCollectionBloc>(
+      () => ArrivalCollectionBloc(service: i.get<ArrivalService>()),
     );
   }
 
@@ -82,7 +87,10 @@ class ArrivalModule extends Module {
         if (task == null) {
           throw ArgumentError('缺少到货任务数据');
         }
-        return ArrivalCollectionPage(task: task);
+        return BlocProvider(
+          create: (context) => Modular.get<ArrivalCollectionBloc>(),
+          child: ArrivalCollectionPage(task: task),
+        );
       },
     );
   }

@@ -14,6 +14,9 @@ class ArrivalTaskDetail extends Equatable {
     required this.subInventory,
     required this.sapLineNo,
     required this.supplierName,
+    required this.controlMode,
+    required this.orderNo,
+    required this.arrivalsBillNo,
   });
 
   factory ArrivalTaskDetail.fromJson(Map<String, dynamic> json) {
@@ -29,6 +32,9 @@ class ArrivalTaskDetail extends Equatable {
       subInventory: json['subinventoryCode']?.toString() ?? '',
       sapLineNo: json['posnr']?.toString() ?? '',
       supplierName: json['parname']?.toString() ?? '',
+      controlMode: json['matcodecontrol']?.toString() ?? '',
+      orderNo: json['orderno']?.toString() ?? '',
+      arrivalsBillNo: json['arrivalsBillno']?.toString() ?? '',
     );
   }
 
@@ -43,6 +49,28 @@ class ArrivalTaskDetail extends Equatable {
   final String subInventory;
   final String sapLineNo;
   final String supplierName;
+  final String controlMode;
+  final String orderNo;
+  final String arrivalsBillNo;
+
+  ArrivalTaskDetail copyWith({double? collectedQty}) {
+    return ArrivalTaskDetail(
+      detailId: detailId,
+      materialCode: materialCode,
+      materialName: materialName,
+      batchNo: batchNo,
+      serialNo: serialNo,
+      planQty: planQty,
+      collectedQty: collectedQty ?? this.collectedQty,
+      storeRoom: storeRoom,
+      subInventory: subInventory,
+      sapLineNo: sapLineNo,
+      supplierName: supplierName,
+      controlMode: controlMode,
+      orderNo: orderNo,
+      arrivalsBillNo: arrivalsBillNo,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -57,6 +85,9 @@ class ArrivalTaskDetail extends Equatable {
         subInventory,
         sapLineNo,
         supplierName,
+        controlMode,
+        orderNo,
+        arrivalsBillNo,
       ];
 }
 
