@@ -4,14 +4,14 @@ class ReceiveBatchActionBar extends StatelessWidget {
   final int selectedCount;
   final int totalCount;
   final VoidCallback onConfirm;
-  final VoidCallback onClear;
+  // final VoidCallback onClear;
 
   const ReceiveBatchActionBar({
     Key? key,
     required this.selectedCount,
     required this.totalCount,
     required this.onConfirm,
-    required this.onClear,
+    // required this.onClear,
   }) : super(key: key);
 
   @override
@@ -42,10 +42,10 @@ class ReceiveBatchActionBar extends StatelessWidget {
                 style: const TextStyle(fontSize: 14),
               ),
             ),
-            TextButton(
-              onPressed: onClear,
-              child: const Text('清除'),
-            ),
+            // TextButton(
+            //   onPressed: onClear,
+            //   child: const Text('清除'),
+            // ),
             const SizedBox(width: 8),
             ElevatedButton(
               onPressed: onConfirm,

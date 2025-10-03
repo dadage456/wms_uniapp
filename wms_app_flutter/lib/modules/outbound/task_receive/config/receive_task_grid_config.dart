@@ -12,18 +12,27 @@ class ReceiveTaskGridConfig {
       GridColumnConfig<OutboundTask>(
         name: 'actions',
         headerText: '操作',
-        width: 140,
+        width: 80,
         valueGetter: (task) => '',
         cellBuilder: (task, _, __) {
-          return SizedBox(
-            height: 32,
-            child: OutlinedButton(
-              onPressed: () => onDetail?.call(task),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF1E88E5)),
-                foregroundColor: const Color(0xFF1E88E5),
+          return Container(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: 30,
+              child: ElevatedButton(
+                onPressed: () => onDetail?.call(task),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007AFF), // Blue background
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                ),
+                child: Text('明细', style: TextStyle(color: Colors.white)),
               ),
-              child: const Text('明细'),
             ),
           );
         },

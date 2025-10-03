@@ -4,6 +4,7 @@ import 'package:wms_app/services/api_response_handler.dart';
 import '../task_details/models/commit_task_item_result.dart';
 import '../task_list/models/outbound_task.dart';
 import '../task_details/models/outbound_task_item.dart';
+
 /// 出库任务服务
 class OutboundTaskService {
   final Dio _dio;
@@ -71,12 +72,12 @@ class OutboundTaskService {
   /// [operationType] 操作类型（'0'表示撤销）
   /// [confirm] 确认标志
   /// 返回撤销操作响应
-  Future<CommitTaskItemResult> cancelOutboundTaskItems({
+  Future<void> cancelOutboundTaskItems({
     required List<String> taskItemIds,
     String operationType = '0',
     String confirm = 'true',
-  }) {
-    return commitOutboundTaskItems(
+  }) async {
+    await commitOutboundTaskItems(
       taskItemIds: taskItemIds,
       roomTag: operationType,
       isCancel: confirm.toLowerCase() == 'true',
@@ -84,26 +85,17 @@ class OutboundTaskService {
   }
 
   /// 提交/接收出库任务明细
-  Future<CommitTaskItemResult> commitOutboundTaskItems({
+  Future<void> commitOutboundTaskItems({
     required List<String> taskItemIds,
     String roomTag = '0',
     bool isCancel = false,
   }) async {
-    final response = await _dio.post<Map<String, dynamic>>(
+    await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitRCOutTaskItem',
       data: {
         'outtaskitemids': taskItemIds,
         'roomTag': roomTag,
         'isCanel': isCancel.toString(),
-      },
-    );
-
-    return ApiResponseHandler.handleResponse<CommitTaskItemResult>(
-      response: response,
-      dataExtractor: (data) {
-        return CommitTaskItemResult.fromJson(
-          Map<String, dynamic>.from(data as Map),
-        );
       },
     );
   }
@@ -134,5 +126,4 @@ class OutboundTaskService {
     // 直接返回内容作为物料编码
     return content;
   }
-
 }

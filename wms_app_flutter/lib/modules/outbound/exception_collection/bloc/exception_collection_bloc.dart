@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +17,7 @@ class ExceptionCollectionBloc
   late OutboundTask _task;
 
   ExceptionCollectionBloc(this._service)
-      : super(const ExceptionCollectionState()) {
+    : super(const ExceptionCollectionState()) {
     on<InitializeExceptionCollectionEvent>(_onInitialize);
     on<ExceptionTypeChangedEvent>(_onTypeChanged);
     on<ExceptionPerformScanEvent>(_onPerformScan);
@@ -52,12 +51,7 @@ class ExceptionCollectionBloc
     ExceptionTypeChangedEvent event,
     Emitter<ExceptionCollectionState> emit,
   ) {
-    emit(
-      state.copyWith(
-        exceptionType: event.type,
-        exceptionName: event.name,
-      ),
-    );
+    emit(state.copyWith(exceptionType: event.type, exceptionName: event.name));
   }
 
   Future<void> _onPerformScan(
@@ -280,14 +274,16 @@ class ExceptionCollectionBloc
   ) {
     if (state.selectedIds.isEmpty) {
       emit(state.copyWith(error: '请至少选择一行记录'));
-      return;
+      return null;
     }
 
     final idSet = state.selectedIds.toSet();
-    final remainingItems =
-        state.items.where((item) => !idSet.contains(item.id)).toList();
-    final remainingStocks =
-        state.stocks.where((stock) => !idSet.contains(stock.id)).toList();
+    final remainingItems = state.items
+        .where((item) => !idSet.contains(item.id))
+        .toList();
+    final remainingStocks = state.stocks
+        .where((stock) => !idSet.contains(stock.id))
+        .toList();
 
     emit(
       state.copyWith(
@@ -339,12 +335,7 @@ class ExceptionCollectionBloc
       clearedState = _applyPlaceholder(clearedState);
       emit(clearedState);
     } catch (e) {
-      emit(
-        state.copyWith(
-          isLoading: false,
-          error: '提交异常：${_formatError(e)}',
-        ),
-      );
+      emit(state.copyWith(isLoading: false, error: '提交异常：${_formatError(e)}'));
     }
   }
 
@@ -362,9 +353,7 @@ class ExceptionCollectionBloc
     emit(state.copyWith(successMessage: null));
   }
 
-  ExceptionCollectionState _applyPlaceholder(
-    ExceptionCollectionState current,
-  ) {
+  ExceptionCollectionState _applyPlaceholder(ExceptionCollectionState current) {
     final placeholder = _computePlaceholder(current);
     return current.copyWith(
       placeholder: placeholder,

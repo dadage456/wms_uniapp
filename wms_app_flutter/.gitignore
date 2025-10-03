@@ -1,0 +1,79 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Flutter/Dart 编译产物
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock  # 应用项目建议忽略，package 项目建议提交
+build/
+*.freezed.dart
+*.g.dart
+*.gr.dart
+*.gen.dart
+*.config.dart
+
+# Android 相关
+**/android/**/*.gradle
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/.gradle/
+**/android/captures/
+**/android/app/release/
+**/android/key.properties
+*.jks
+
+# iOS/macOS 相关
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Web 相关
+lib/generated_plugin_registrant.dart
+
+# 测试与覆盖率
+coverage/
+test/**/failures/
+
+# IDE 相关
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS 杂项
+.DS_Store
+Thumbs.db
+
+# 日志 & 临时
+*.log
+*.tmp

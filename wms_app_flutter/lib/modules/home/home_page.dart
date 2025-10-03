@@ -325,7 +325,6 @@ class _FunctionGrid extends StatelessWidget {
           if (f.title == '平库出库') {
             Modular.to.pushNamed('/outbound');
           } else if (f.title == '平库下架接收') {
-            Modular.to.pushNamed('/outbound/receive');
           } else if (f.title == '到货接收') {
             Modular.to.pushNamed('/arrival');
           } else if (f.title == '立库组盘') {

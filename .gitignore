@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# uni-app 编译产物
+unpackage/
+dist/
+.hbuilderx/
+
+# 全局杂项
+.DS_Store
+node_modules/
+*.log

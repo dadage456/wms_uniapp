@@ -16,7 +16,7 @@ class ReceiveTaskDetailBloc
   final UserManager userManager;
 
   ReceiveTaskDetailBloc(this.outboundTaskService, this.userManager)
-      : super(const ReceiveTaskDetailState()) {
+    : super(const ReceiveTaskDetailState()) {
     on<SearchReceiveTaskItemsEvent>(_onSearch);
     on<ReceiveSelectedItemsEvent>(_onReceiveSelected);
     on<RefreshReceiveTaskItemsEvent>(_onRefresh);
@@ -29,7 +29,7 @@ class ReceiveTaskDetailBloc
   void _initGridBloc() {
     gridBloc = CommonDataGridBloc<OutboundTaskItem>(
       dataLoader: _createLoader(),
-      dataDeleter: _createReceiver(),
+      dataCommiter: _createReceiver(),
     );
   }
 
@@ -38,8 +38,8 @@ class ReceiveTaskDetailBloc
     currentQuery = OutboundTaskItemQuery(
       outTaskId: task.outTaskId.toString(),
       workStation: task.workStation,
-      userId: userInfo.userId,
-      roleOrUserId: userInfo.userId,
+      userId: 'ALL',
+      roleOrUserId: userInfo.userId.toString(),
       pageIndex: 1,
       pageSize: 100,
     );
@@ -91,7 +91,7 @@ class ReceiveTaskDetailBloc
     ReceiveSelectedItemsEvent event,
     Emitter<ReceiveTaskDetailState> emit,
   ) async {
-    gridBloc.add(DeleteSelectedRowsEvent(event.selectedRows));
+    gridBloc.add(CommitSelectedRowsEvent(event.selectedRows));
   }
 
   Future<void> _onRefresh(
@@ -101,9 +101,7 @@ class ReceiveTaskDetailBloc
     try {
       gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
     } catch (e) {
-      emit(
-        state.copyWith(errorMessage: ErrorHandler.handleError(e)),
-      );
+      emit(state.copyWith(errorMessage: ErrorHandler.handleError(e)));
     }
   }
 }
