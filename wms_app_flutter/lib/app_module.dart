@@ -9,6 +9,7 @@ import 'package:wms_app/services/api_service.dart';
 import 'modules/outbound/outbound_module.dart';
 import 'modules/feature_placeholder/feature_placeholder_bloc.dart';
 import 'modules/feature_placeholder/feature_placeholder_module.dart';
+import 'modules/floor_inbound/floor_inbound_module.dart';
 
 /// 应用主模块
 class AppModule extends Module {
@@ -73,19 +74,7 @@ class AppModule extends Module {
       ),
     );
 
-    r.module(
-      '/floor-inbound',
-      module: FeaturePlaceholderModule(
-        info: const FeaturePlaceholderInfo(
-          title: '平库入库',
-          description: '平库入库模块正在迁移至Flutter，敬请期待。',
-          todoItems: [
-            '梳理入库任务与采集接口',
-            '复用出库模块的分页、筛选及扫码架构',
-          ],
-        ),
-      ),
-    );
+    r.module('/floor-inbound', module: FloorInboundModule());
 
     r.module(
       '/online-picking',
