@@ -57,40 +57,6 @@ class _ReceiveTaskPageState extends State<ReceiveTaskPage> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      decoration: const BoxDecoration(color: Colors.white),
-      child: TextField(
-        controller: _controller,
-        decoration: InputDecoration(
-          hintText: '请扫描单号',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.grey[200],
-          suffixIcon: ValueListenableBuilder<TextEditingValue>(
-            valueListenable: _controller,
-            builder: (_, value, __) => value.text.isEmpty
-                ? const SizedBox.shrink()
-                : IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _controller.clear();
-                      _bloc.add(const SearchReceiveTasksEvent(''));
-                    },
-                  ),
-          ),
-        ),
-        onSubmitted: (value) {
-          _bloc.add(SearchReceiveTasksEvent(value));
-        },
-      ),
-    );
-  }
-
   Widget _buildScanInput() {
     return Container(
       height: 56,
